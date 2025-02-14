@@ -1,16 +1,14 @@
 # ICC Evaluation Core Coordination
 
-This repo is a _public_ place for coordination of ICC Eval Core activities, such as:
+This repo is a central _public_ place for coordinating ICC Evaluation Core activities.
+It is a place for things like:
 
-- Creating [issues](../../issues) for questions/concerns/feedback
-- [Discussions](../../discussions)
+- Documentation and guides
+- [Having discussions and getting help](discussions)
+- [Raising questions/concerns and providing feedback](issues)
 - Project planning
-- Storing various documentation or other assets
+- Storing assets
 
 ## Points of Interest
 
-### CFDE Evaluation Submission
-
-We are the Integration and Coordination Center (ICC), a center within the CFDE responsible for, among other things, gathering metrics for reporting on the impact and influence of the CFDE.
-
-[ℹ️ Learn how to submit your Common Fund project for metric collection here](https://nih-cfde.github.io/icc-eval-coordination/).
+[ℹ️ Learn how to submit your Common Fund project for metric collection](https://nih-cfde.github.io/icc-eval-coordination/).
