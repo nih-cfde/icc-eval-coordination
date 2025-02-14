@@ -1,205 +1,230 @@
 <html>
+  <head>
+    <title>CFDE Evaluation Submission</title>
 
-<head>
-  <title>CFDE Evaluation Submission</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-    rel="stylesheet" />
+    <style>
+      html {
+        background: #f0f0f0;
+        padding: 20px;
+      }
 
-  <style>
-    html {
-      background: #f0f0f0;
-      padding: 20px;
-    }
+      body {
+        max-width: 600px;
+        margin: auto;
+        padding: 40px;
+        background: white;
+        font-family: "Open Sans", sans-serif;
+        font-weight: 350;
+        line-height: 1.5;
+      }
 
-    body {
-      max-width: 600px;
-      margin: auto;
-      padding: 40px;
-      background: white;
-      font-family: "Open Sans", sans-serif;
-      line-height: 1.5;
-    }
-  </style>
-</head>
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 600;
+        border-bottom: solid 1px lightgray;
+      }
 
-<body>
-  <h1>CFDE Evaluation Submission</h1>
+      strong {
+        font-weight: 600;
+      }
 
-  <h2 id="overview">Overview</h2>
+      code {
+        background: #f0f0f0;
+        padding: 2px 5px;
+      }
+    </style>
+  </head>
 
-  <p>
-    The
-    <a href="https://commonfund.nih.gov/dataecosystem">Common Fund Data Ecosystem (CFDE)</a>
-    is an effort to bring together knowledge across
-    <a href="https://commonfund.nih.gov/">NIH Common Fund</a> programs into a
-    cohesive resource.
-  </p>
+  <body>
+    <h1>CFDE Evaluation Submission</h1>
 
-  <p>
-    We are the Integration and Coordination Center (ICC), a center within the
-    CFDE responsible for, among other things, gathering metrics for reporting
-    on the impact and influence of the CFDE.
-  </p>
+    <h2 id="overview">Overview</h2>
 
-  <p>
-    This page contains instructions on how to submit your Common Fund project
-    so that we can gather metrics on it and submit it to the NIH for
-    evaluation as required.
-  </p>
+    <p>
+      The
+      <a href="https://commonfund.nih.gov/dataecosystem"
+        >Common Fund Data Ecosystem (CFDE)</a
+      >
+      is an effort to bring together knowledge across
+      <a href="https://commonfund.nih.gov/">NIH Common Fund</a> programs into a
+      cohesive resource.
+    </p>
 
-  <h2 id="contact">Contact</h2>
+    <p>
+      We are the Integration and Coordination Center (ICC), a center within the
+      CFDE responsible for, among other things, collecting metrics associated
+      with Common Fund projects and providing them to the NIH.
+    </p>
 
-  <p>
-    If you have any questions, suggestions, comments, or feedback, please file
-    a
-    <a href="../../issues/new">new issue</a>, or contact one of the current
-    maintainers/team members directly:
-  </p>
+    <p>
+      This page contains instructions on how to
+      <strong>submit your Common Fund project</strong>
+      so that we can properly collect the required metrics on it.
+    </p>
 
-  <ul>
-    <li>
-      <a href="mailto:casey.s.greene@cuanschutz.edu">Casey Greene</a> -
-      Evaluation Core Lead
-    </li>
-    <li>
-      <a href="mailto:sean.2.davis@cuanschutz.edu">Sean Davis</a> - Evaluation
-      Core Lead
-    </li>
-    <li>
-      <a href="mailto:vincent.rubinetti@cuanschutz.edu">Vincent Rubinetti</a>
-      (<a href="https://github.com/vincerubinetti">@vincerubinetti</a>) -
-      Software developer
-    </li>
-  </ul>
+    <h2 id="contact">Contact</h2>
 
-  <h2 id="submit-your-project">Submit your project</h2>
+    <p>
+      If you have any questions, suggestions, comments, or feedback, please file
+      a
+      <a href="../../issues/new">new issue</a>, or contact one of the current
+      maintainers/team members directly:
+    </p>
 
-  <p>
-    We gather most details about Common Fund projects automatically from NIH
-    systems, but there are some pieces of info that require manual actions to
-    be integrated. We've tried to make this process as easy and automated as
-    possible.
-  </p>
+    <ul>
+      <li>
+        <a href="mailto:casey.s.greene@cuanschutz.edu">Casey Greene</a> -
+        Evaluation Core Lead
+      </li>
+      <li>
+        <a href="mailto:sean.2.davis@cuanschutz.edu">Sean Davis</a> - Evaluation
+        Core Lead
+      </li>
+      <li>
+        <a href="mailto:vincent.rubinetti@cuanschutz.edu">Vincent Rubinetti</a>
+        (<a href="https://github.com/vincerubinetti">@vincerubinetti</a>) -
+        Software developer
+      </li>
+    </ul>
 
-  <h3 id="submit-software-repositories">Submit software repositories</h3>
+    <h2 id="submit-your-project">Submit your project</h2>
 
-  <p>
-    Repositories ("repos") are places for storing, tracking changes to, and
-    collaborating on software.
-  </p>
+    <p>
+      Many metrics about Common Fund projects &ndash; like grant details,
+      publications, and citations &ndash; we can already automatically collect
+      from public NIH resources. However, other metrics
+      <strong>require some manual steps from project teams</strong>
+      before we can collect them.
+    </p>
 
-  <p>
-    Currently, we only take submissions of software kept in
-    <em>public</em> GitHub.com repos. Private repos and other platforms such
-    as GitLab aren't supported yet.
-  </p>
+    <p>
+      Here's how you can submit these other metrics. We've tried to make this
+      process as easy and minimal as possible.
+    </p>
 
-  <ol>
-    <li>
-      Find all GitHub repos that are associated with your project.
-      <ol>
-        <li>
-          If you're unsure where to find these, ask members of your project
-          about any software that was written in support of it, and where the
-          code for the software resides.
-        </li>
-      </ol>
-    </li>
-    <li>
-      "Tag" each repo with the project.
-      <ol>
-        <li>
-          See
-          <a
-            href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics">GitHub's
-            instructions for tagging repos</a>
-          for reference.
-        </li>
-        <li>
-          On the main page of the repo, click on the gear ⚙ next to "About".
-        </li>
-        <li>
-          Under "Topics", type in your
-          <em>core project number</em>†, e.g.
-          <code>U54OD036472</code> (case-insensitive).
-        </li>
-      </ol>
-    </li>
-  </ol>
+    <h3 id="submit-software-repositories">Submit software repositories</h3>
 
-  <p>
-    <a href="https://github.com/nih-cfde/icc-eval-core">This repository itself</a>
-    has been
-    <a href="https://github.com/topics/u54od036472">tagged with its core project number</a>, so use it as a reference.
-  </p>
+    <p>
+      Repositories ("repos") are places for storing, tracking changes to, and
+      collaborating on software.
+    </p>
 
-  <p>
-    † Do not confuse this with a (sub) "project" number, which is longer, e.g.
-    <code>1U54OD036472-01</code>.
-  </p>
+    <p>
+      Currently, we only take submissions of software kept in
+      <strong>public GitHub</strong> repos. Private repos and other platforms
+      such as GitLab aren't supported yet.
+    </p>
 
-  <h3 id="submit-analytics">Submit analytics</h3>
+    <ol>
+      <li>
+        Find all GitHub repos that are associated with your project.
+        <ol>
+          <li>
+            If you're unsure where to find these, ask members of your project
+            about any software that was written in support of it, and where the
+            code for the software resides.
+          </li>
+        </ol>
+      </li>
+      <li>
+        "Tag" each repo with the project.
+        <ol>
+          <li>
+            See
+            <a
+              href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics"
+              >GitHub's instructions for tagging repos</a
+            >
+            for reference.
+          </li>
+          <li>
+            On the main page of the repo, click on the gear ⚙ next to "About".
+          </li>
+          <li>
+            Under "Topics", type in your
+            <em>core project number</em>, e.g.
+            <code>U54OD036472</code> (case-insensitive). Don't confuse this with
+            a (sub) "project" number, which is longer, e.g.
+            <code>1U54OD036472-01</code>.
+          </li>
+        </ol>
+      </li>
+    </ol>
 
-  <p>
-    Analytics are services that monitor traffic (number of visits over time,
-    number of unique visitors, visitor demographics, etc.) on publicly
-    accessible webpages.
-  </p>
+    <h3 id="submit-analytics">Submit analytics</h3>
 
-  <p>
-    Currently, we only take submissions of webpages using Google Analytics.
-    Other analytics services may supported in the future.
-  </p>
+    <p>
+      Analytics are services that monitor traffic (number of visits over time,
+      number of unique visitors, visitor demographics, etc.) on public webpages.
+    </p>
 
-  <ol>
-    <li>
-      Find all Google Analytics properties that are associated with your
-      project.
-      <ol>
-        <li>
-          If you're unsure where to find these, ask members of your project
-          about any webpages related to it, and if anyone set up analytics for
-          them.
-        </li>
-      </ol>
-    </li>
-    <li>
-      Allow us access to each property.
-      <ol>
-        <li>
-          Go to the
-          <a href="https://analytics.google.com/">Google Analytics dashboard</a>
-          and make sure you are
-          <a href="https://support.google.com/analytics/answer/10252712?hl=en">on the right property</a>.
-        </li>
-        <li>
-          Find "Property Access Management" from the main search bar (or the
-          "Admin" side menu).
-        </li>
-        <li>
-          Add a new user with the email
-          <code>api-access@cfde-icc-eval-core-433116.iam.gserviceaccount.com</code>, uncheck "Notify by email", and
-          select the "Viewer" role.
-        </li>
-      </ol>
-    </li>
-    <li>
-      "Tag" each property so we can associate it with a particular project.
-      <ol>
-        <li>
-          Find "Key Events" from the "Admin" side menu,under "Data Display".
-        </li>
-        <li>
-          Create a new key event with the name
-          <code>cfde_XXX</code> (case-insensitive), where XXX is the
-          <em>core</em> project number, e.g. <code>cfde_R03OD034502</code>.
-        </li>
-      </ol>
-    </li>
-  </ol>
-</body>
+    <p>
+      Currently, we only take submissions of webpages using
+      <strong>Google Analytics</strong>. Other analytics services may be
+      supported in the future.
+    </p>
 
+    <ol>
+      <li>
+        Find all Google Analytics properties that are associated with your
+        project.
+        <ol>
+          <li>
+            If you're unsure where to find these, ask members of your project
+            about any webpages related to it, and if anyone set up analytics for
+            them.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Give us read access to each property.
+        <ol>
+          <li>
+            Go to the
+            <a href="https://analytics.google.com/"
+              >Google Analytics dashboard</a
+            >
+            and make sure you are
+            <a href="https://support.google.com/analytics/answer/10252712?hl=en"
+              >on the right property</a
+            >.
+          </li>
+          <li>
+            Find "Property Access Management" from the main search bar (or the
+            "Admin" side menu).
+          </li>
+          <li>
+            Add a new user with the email
+            <code
+              >api-access@cfde-icc-eval-core-433116.iam.gserviceaccount.com</code
+            >, uncheck "Notify by email", and select the "Viewer" role.
+          </li>
+        </ol>
+      </li>
+      <li>
+        "Tag" each property so we can associate it with a particular project.
+        <ol>
+          <li>
+            Find "Key Events" from the "Admin" side menu,under "Data Display".
+          </li>
+          <li>
+            Create a new key event with the name
+            <code>cfde_XXX</code> (case-insensitive), where XXX is your
+            <em>core project number</em>, e.g. <code>cfde_U54OD036472</code>.
+            Don't confuse this with a (sub) "project" number, which is longer,
+            e.g. <code>1U54OD036472-01</code>.
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </body>
 </html>
