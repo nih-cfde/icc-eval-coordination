@@ -170,9 +170,7 @@
 
     <pre class="mermaid">
       flowchart
-        subgraph g1["
-          <b>Standard info</b>, already public
-        "]
+        subgraph g1["<b>Standard info</b>, already public"]
           direction TB
           n1("
             <b>Projects</b>
@@ -196,9 +194,7 @@
             <i>scimagojr.com</i>
           "):::node
         end
-        subgraph g2["
-          <b>Extra info</b>, possibly sensitive
-        "]
+        subgraph g2["<b>Extra info</b>, possibly sensitive"]
           direction TB
           n5("
             <b>YOU</b> #quot;tag#quot; your properties with project # and grant us access
@@ -234,9 +230,10 @@
         n7 -->|<b>WE</b> search whole site for project # tags| n8
         g1 --> g3
         g2 -->|Linked to projects with tag #s| g3
-        classDef group color:black,stroke-width:0px,fill:#f0f0f0
+        classDef group color:black,stroke-width:0px,fill:#f0f0f0,white-space:nowrap
         classDef node color:black,stroke-width:0px,fill:#e0e0e0
         linkStyle default color:black,stroke:black
+        linkStyle 6 white-space:nowrap;
     </pre>
 
     <h2>How to submit</h2>
