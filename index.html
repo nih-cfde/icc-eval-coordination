@@ -149,11 +149,10 @@
     </p>
 
     <p>
-      This page is about extra info that
-      <em>we can't gather automatically</em>. At present, this just means we
-      need you to
-      <strong>manually tag some things with your project numbers</strong> so we
-      can associate them with your projects.
+      This page is about
+      <strong>extra info that we can't gather automatically</strong>. At
+      present, this just means we need you to manually tag some things with your
+      project numbers so we can associate them with your projects.
     </p>
 
     <p>
@@ -164,9 +163,10 @@
 
     <h3>How does it work?</h3>
 
-    Under the hood, we gather info with scripts that run periodically and
-    automatically, or on demand. Here is a high-level explanation of what info
-    we gather and where we gather it from.
+    Under the hood, we gather info with scripts that run periodically or on
+    demand. Here is a high-level explanation of what info we gather and where we
+    gather it from. All parts of this process are automatic, except parts marked
+    with ✍️ that need some manual action.
 
     <pre class="mermaid">
       flowchart
@@ -197,7 +197,7 @@
         subgraph g2["<b>Extra info</b>, possibly sensitive"]
           direction TB
           n5("
-            <b>YOU</b> #quot;tag#quot; your properties with project # and grant us access
+            ✍️ #quot;Tag#quot; your properties with project # and grant us access
           "):::node
           n6("
             <b>Analytics</b>
@@ -205,7 +205,7 @@
             <i>analyticsdata.googleapis.com</i>
           "):::node
           n7("
-            <b>YOU</b> #quot;tag#quot; your repos with project #
+            ✍️ #quot;Tag#quot; your repos with project #
           "):::node
           n8("
             <b>Repos</b>
@@ -226,8 +226,8 @@
         n1 --> n2
         n2 --> n3
         n3 --> n4
-        n5 -->|<b>WE</b> get properties we have access to| n6
-        n7 -->|<b>WE</b> search whole site for project # tags| n8
+        n5 -->|Get properties we have access to| n6
+        n7 -->|Search whole site for project # tags| n8
         g1 --> g3
         g2 -->|Linked to projects with tag #s| g3
         classDef group color:black,stroke-width:0px,fill:#f0f0f0,white-space:nowrap
@@ -388,12 +388,16 @@
           .split(/[^a-z]/)
           .filter(Boolean)
           .join("-");
+        heading.setAttribute("id", id);
         const link = document.createElement("a");
         link.innerHTML = "#";
         link.className = "anchor";
         link.href = "#" + id;
         heading.append(link);
       }
+      document
+        .getElementById(window.location.hash?.slice(1))
+        ?.scrollIntoView(true);
     </script>
   </body>
 </html>
