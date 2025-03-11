@@ -9,6 +9,8 @@
       rel="stylesheet"
     />
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+
     <style>
       html {
         background: #f0f0f0;
@@ -30,24 +32,44 @@
       h3,
       h4 {
         font-weight: 600;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      h2 {
         border-bottom: solid 1px lightgray;
       }
 
       strong {
-        font-weight: 600;
+        font-weight: 500;
       }
 
       code {
         background: #f0f0f0;
         padding: 2px 5px;
       }
+
+      .anchor {
+        margin-left: 10px;
+        text-decoration: none;
+        opacity: 0.05;
+      }
+
+      :is(h1, h2, h3, h4):hover .anchor,
+      .anchor:focus {
+        opacity: 1;
+      }
     </style>
   </head>
 
   <body>
-    <h1>CFDE Evaluation Submission</h1>
+    <h1>CFDE Project Submission</h1>
 
-    <h2 id="overview">Overview</h2>
+    <h2>Overview</h2>
+
+    <h3>What is the CFDE?</h3>
 
     <p>
       The
@@ -59,60 +81,169 @@
       cohesive resource.
     </p>
 
+    <h3>Who are we?</h3>
+
     <p>
-      We are the Integration and Coordination Center (ICC), a center within the
-      CFDE responsible for, among other things, collecting metrics associated
-      with Common Fund projects and providing them to the NIH. We do this in
-      close collaboration with other Centers and NIH program staff.
+      The authors of this page are the Integration and Coordination Center
+      (ICC), a center within the CFDE.
     </p>
 
     <p>
-      This page contains instructions on how to
-      <strong>submit your Common Fund project</strong>
-      so that we can properly collect the required metrics on it.
-    </p>
-
-    <h2 id="contact">Contact</h2>
-
-    <p>
-      If you have any questions, suggestions, comments, or feedback, please file
-      a
-      <a href="../../issues/new">new issue</a>, or contact one of the current
-      maintainers/team members directly:
-    </p>
-
-    <ul>
-      <li>
-        <a href="mailto:casey.s.greene@cuanschutz.edu">Casey Greene</a> -
-        Evaluation Core Lead
-      </li>
-      <li>
-        <a href="mailto:sean.2.davis@cuanschutz.edu">Sean Davis</a> - Evaluation
-        Core Lead
-      </li>
-      <li>
-        <a href="mailto:vincent.rubinetti@cuanschutz.edu">Vincent Rubinetti</a>
-        (<a href="https://github.com/vincerubinetti">@vincerubinetti</a>) -
-        Software developer
-      </li>
-    </ul>
-
-    <h2 id="submit-your-project">Submit your project</h2>
-
-    <p>
-      Many metrics about Common Fund projects &ndash; like grant details,
-      publications, and citations &ndash; we can already automatically collect
-      from public NIH resources. However, other metrics
-      <strong>require some manual steps from project teams</strong>
-      before we can collect them.
+      We are responsible for (among other things) gathering info associated with
+      Common Fund projects and providing it to the NIH. We also aim to make
+      standard info that is already public more accessible to everyone by
+      gathering it in a central place.
     </p>
 
     <p>
-      Here's how you can submit these other metrics. We've tried to make this
-      process as easy and minimal as possible.
+      We do not operate alone; we do this in close collaboration with other
+      Centers and NIH program staff.
     </p>
 
-    <h3 id="submit-software-repositories">Submit software repositories</h3>
+    <h3>What is this page?</h3>
+
+    <p>
+      This page tells you how you can provide us with some
+      <strong>extra info about your Common Fund project</strong>, allowing the
+      NIH to see a fuller picture of your work.
+    </p>
+
+    <p>Continue reading to find out exactly what this extra info is.</p>
+
+    <h3>What do we do with this extra info?</h3>
+
+    <p>
+      Some may consider this extra info to be sensitive. Because of this, we
+      keep it private, with limited/privileged access.
+    </p>
+
+    <p>
+      We do not judge or evaluate your projects in any way, we only gather info
+      and provide it to the NIH.
+    </p>
+
+    <h3>Is this required?</h3>
+
+    <p>
+      Currently no, but it may be required in the future. Being funded by the
+      NIH, Common Fund projects may have certain reporting obligations.
+    </p>
+
+    <p>
+      For now, this is opt-in. We (and the NIH) won't know about this extra info
+      if you don't follow this page.
+    </p>
+
+    <p>
+      But regardless of requirements, it strongly encouraged so that you can
+      take full credit for your work!
+    </p>
+
+    <h3>Can't this be automatic?</h3>
+
+    <p>
+      Most of what we gather already is. Standard info about Common Fund
+      projects &ndash; like grant details, publications, and citations &ndash;
+      are <strong>already publicly available</strong> through resources like
+      <a href="https://icite.od.nih.gov/api">iCite</a>.
+    </p>
+
+    <p>
+      This page is about extra info that
+      <em>we can't gather automatically</em>. At present, this just means we
+      need you to
+      <strong>manually tag some things with your project numbers</strong> so we
+      can associate them with your projects.
+    </p>
+
+    <p>
+      We've tried to make this process as <em>easy and minimal as possible</em>.
+      If you already know your project numbers, it should only take a few
+      minutes!
+    </p>
+
+    <h3>How does it work?</h3>
+
+    Under the hood, we gather info with scripts that run periodically and
+    automatically, or on demand. Here is a high-level explanation of what info
+    we gather and where we gather it from.
+
+    <pre class="mermaid">
+      flowchart
+        subgraph g1["
+          <b>Standard info</b>, already public
+        "]
+          direction TB
+          n1("
+            <b>Projects</b>
+            #/ID, activ. code, etc.
+            <i>commonfund.nih.gov</i>
+          "):::node
+          n2("
+            <b>Project details</b>
+            Name, award $, dates, etc.
+            <i>api.reporter.nih.gov</i>
+          "):::node
+          n3("
+            <b>Publications</b>
+            Title, authors, dates, citations, etc.
+            <i>icite.od.nih.gov</i>
+            <i>api.reporter.nih.gov</i>
+          "):::node
+          n4("
+            <b>Journals</b>
+            <i>eutils.ncbi.nlm.nih.gov</i>
+            <i>scimagojr.com</i>
+          "):::node
+        end
+        subgraph g2["
+          <b>Extra info</b>, possibly sensitive
+        "]
+          direction TB
+          n5("
+            <b>YOU</b> #quot;tag#quot; your properties with project # and grant us access
+          "):::node
+          n6("
+            <b>Analytics</b>
+            Page views, new users, top regions, etc.
+            <i>analyticsdata.googleapis.com</i>
+          "):::node
+          n7("
+            <b>YOU</b> #quot;tag#quot; your repos with project #
+          "):::node
+          n8("
+            <b>Repos</b>
+            Stars, commits, issues, PRs, etc.
+            <i>api.github.com</i>
+          "):::node
+        end
+        subgraph g3["Private repo"]
+          direction TB
+          n9("
+            <b>All gathered data</b>
+            Structured JSON
+          "):::node
+        end
+        g1:::group
+        g2:::group
+        g3:::group
+        n1 --> n2
+        n2 --> n3
+        n3 --> n4
+        n5 -->|<b>WE</b> get properties we have access to| n6
+        n7 -->|<b>WE</b> search whole site for project # tags| n8
+        g1 --> g3
+        g2 -->|Linked to projects with tag #s| g3
+        classDef group color:black,stroke-width:0px,fill:#f0f0f0
+        classDef node color:black,stroke-width:0px,fill:#e0e0e0
+        linkStyle default color:black,stroke:black
+    </pre>
+
+    <h2>How to submit</h2>
+
+    <p>How to submit extra info about your Common Fund project.</p>
+
+    <h3>Submit software repositories</h3>
 
     <p>
       Repositories ("repos") are places for storing, tracking changes to, and
@@ -161,7 +292,7 @@
       </li>
     </ol>
 
-    <h3 id="submit-analytics">Submit analytics</h3>
+    <h3>Submit analytics</h3>
 
     <p>
       Analytics are services that monitor traffic (number of visits over time,
@@ -227,5 +358,45 @@
         </ol>
       </li>
     </ol>
+
+    <h2>Contact</h2>
+
+    <p>
+      If you have any questions, suggestions, comments, or feedback, please file
+      a
+      <a href="../../issues/new">new issue</a>, or contact one of the current
+      maintainers/team members directly:
+    </p>
+
+    <ul>
+      <li>
+        <a href="mailto:casey.s.greene@cuanschutz.edu">Casey Greene</a> -
+        Evaluation Core Lead
+      </li>
+      <li>
+        <a href="mailto:sean.2.davis@cuanschutz.edu">Sean Davis</a> - Evaluation
+        Core Lead
+      </li>
+      <li>
+        <a href="mailto:vincent.rubinetti@cuanschutz.edu">Vincent Rubinetti</a>
+        (<a href="https://github.com/vincerubinetti">@vincerubinetti</a>) -
+        Software developer
+      </li>
+    </ul>
+
+    <script>
+      for (const heading of document.querySelectorAll(":is(h2, h3, h4)")) {
+        const id = heading.textContent
+          .toLowerCase()
+          .split(/[^a-z]/)
+          .filter(Boolean)
+          .join("-");
+        const link = document.createElement("a");
+        link.innerHTML = "#";
+        link.className = "anchor";
+        link.href = "#" + id;
+        heading.append(link);
+      }
+    </script>
   </body>
 </html>
