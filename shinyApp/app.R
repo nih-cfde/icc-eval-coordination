@@ -2,6 +2,7 @@ library(shiny)
 library(httr)
 library(jsonlite)
 library(shinyjs)
+library(DT)
 
 if (interactive()) {
   options(shiny.port = 8100) ##set stable port for testing
@@ -13,7 +14,9 @@ ui <- fluidPage(
   titlePanel("CFDE: GitHub Onboarding Helper"),
   sidebarLayout(
     sidebarPanel(
+      width = 6,
       actionButton("login", "Sign in with GitHub"),
+      dataTableOutput("project_table"),
       uiOutput("repo_selector"),
       textInput("topic", "Enter a topic to add"),
       actionButton("add_topic", "Add Topic")
@@ -57,6 +60,37 @@ server <- function(input, output, session) {
     shinyjs::show("repo_selector")
   })
   
+  # NIH Project Selector
+  projects <- read.csv('shinyApp/data/reporter-projects.csv')
+  output$project_table <- renderDataTable({
+    projects %>% 
+      DT::datatable(
+        rownames = F,
+        colnames = c("Core Project Number", "Project Number", "Project Title", "Project Detail URL", "Organization"),
+        escape = FALSE,
+        filter = list(position = "top", clear = FALSE),             
+        selection = "single",
+        options = list(
+          scrollY = 300,
+          paging = FALSE,
+          columnDefs = list(
+            list(
+              targets = c(5,6),
+              searchable = TRUE,
+              visible = FALSE
+              )
+            )
+          )
+        )
+  })
+  observeEvent(input$project_table_rows_selected, {
+    selected_row <- input$project_table_rows_selected
+    if (length(selected_row) > 0) {
+      row_data <- projects[selected_row, 'core_project_num']
+      updateTextInput(session, "topic", value = paste(row_data, collapse = ", "))
+    }
+  })
+
   # Repo UI
   output$repo_selector <- renderUI({
     if (!is.null(github_token())) {
