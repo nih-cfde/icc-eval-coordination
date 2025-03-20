@@ -1,4 +1,5 @@
 library(shiny)
+library(bslib)
 library(httr)
 library(jsonlite)
 library(shinyjs)
@@ -9,25 +10,25 @@ if (interactive()) {
   }
 
 ## Basic UI
-ui <- fluidPage(
-  useShinyjs(),
-  titlePanel("CFDE: GitHub Onboarding Helper"),
-  sidebarLayout(
-    sidebarPanel(
-      width = 6,
-      actionButton("login", "Sign in with GitHub"),
-      dataTableOutput("project_table"),
-      uiOutput("repo_selector"),
-      textInput("topic", "Enter a topic to add"),
-      actionButton("add_topic", "Add Topic")
+ui <- 
+  page_fluid(
+    useShinyjs(),
+    titlePanel("CFDE: GitHub Onboarding Helper"),
+    layout_sidebar(
+      sidebar = sidebar(
+        actionButton("login", "Sign in with GitHub", icon = icon("github"))
+      ),
+      mainPanel(
+        textOutput("status"),
+        verbatimTextOutput("user_info"),
+        dataTableOutput("project_table"),
+        uiOutput("repo_selector"),
+        textInput("topic", "Enter a topic to add"),
+        actionButton("add_topic", "Add Topic"),
+        tableOutput("repo_table")
+      )
     ),
-    mainPanel(
-      textOutput("status"),
-      verbatimTextOutput("user_info"),
-      tableOutput("repo_table")
-    )
   )
-)
 
 ## Server
 server <- function(input, output, session) {
@@ -71,7 +72,7 @@ server <- function(input, output, session) {
         filter = list(position = "top", clear = FALSE),             
         selection = "single",
         options = list(
-          scrollY = 300,
+          scrollY = 600,
           paging = FALSE,
           columnDefs = list(
             list(
