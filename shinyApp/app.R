@@ -13,12 +13,13 @@ if (interactive()) {
 ui <- 
   page_fluid(
     useShinyjs(),
-    titlePanel("CFDE: GitHub Onboarding Helper"),
+    title = "CFDE: Onboard Assist",
+    titlePanel("CFDE: Onboard Assist"),
     layout_sidebar(
       sidebar = sidebar(
         actionButton("login", "Sign in with GitHub", icon = icon("github"))
       ),
-      mainPanel(
+      page_fluid(
         textOutput("status"),
         verbatimTextOutput("user_info"),
         dataTableOutput("project_table"),
