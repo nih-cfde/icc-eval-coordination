@@ -36,9 +36,9 @@ ui <-
       ),
       page_fluid(
         h4('NIH Project Locator'),
-        p("If you already know your NIH Core Project number, great! You can sign-in with your GitHub credentials and
-          tag related repositories below. If not, try searching for your project using the table below. You can also 
-          try searching by project keywords to help locate your core project number."),
+        p("If you already know your NIH Core Project Number, great! You can sign-in with your GitHub credentials and
+          tag related repositories below. If not, try searching for your project using the table. You can also try 
+          searching by project keywords to help locate your Core Project Number."),
         card(
           card_body(
             dataTableOutput("project_table"),
@@ -51,8 +51,8 @@ ui <-
             fluidRow(
               id = "github_repo_instructions",
               h4("GitHub Repositories"),
-              p("Select a repository to tag with your NIH Core Project number. Selections may be made from the dropdown, or
-                by clicking rows in the table below."
+              p("Select a repository to tag with your NIH Core Project Number. Selections may be made from the dropdown
+                or by clicking rows in the table below."
               )
             ),
             fluidRow(
