@@ -160,7 +160,12 @@ server <- function(input, output, session) {
       req_repos <- GET("https://api.github.com/user/repos", config(token = github_token()))
       repos <- content(req_repos)
       repo_names <- sapply(repos, function(x) x$name)
-      selectInput("repo", "Select a repository to tag:", choices = repo_names)
+      selectInput(inputId = "repo", 
+                  label = "Select a repository to tag:", 
+                  choices = repo_names,
+                  multiple = TRUE,
+                  selectize = FALSE
+                 )
     }
   })
   
@@ -203,6 +208,7 @@ server <- function(input, output, session) {
   })
   
   ## Show all User GitHub Repos
+  user_repos <- reactiveVal(NULL)
   output$repo_table <- renderDataTable({
     if (!is.null(github_token())) {
       req_repo_table <- GET("https://api.github.com/user/repos", config(token = github_token()))
@@ -211,10 +217,13 @@ server <- function(input, output, session) {
       name <- sapply(repos_table, function(x) x$name)
       description <- unlist(replace_null(sapply(repos_table, function(x) x$description)))
       url <- sapply(repos_table, function(x) x$html_url)
-      tibble::tibble(Name = name, 
-                     Description = description,
-                     URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
-                    ) %>% 
+      user_repos(
+        tibble(Name = name, 
+          Description = description,
+          URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
+        )
+      ) 
+      user_repos() %>% 
         DT::datatable(
           rownames = F,
           escape = FALSE,
@@ -224,6 +233,13 @@ server <- function(input, output, session) {
             paging = FALSE
           )
         )
+    }
+  })
+  observeEvent(input$repo_table_rows_selected, {
+    selected_repo_row <- input$repo_table_rows_selected
+    if (length(selected_repo_row) > 0) {
+      repo_row_data <- user_repos()[selected_repo_row, 'Name', drop = TRUE]
+      updateSelectInput(session, "repo", selected = repo_row_data)
     }
   })
 }
