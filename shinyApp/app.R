@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 library(bslib)
+library(shinyWidgets)
 library(httr)
 library(tibble)
 library(glue)
@@ -20,7 +21,7 @@ ui <-
       HTML("
         .centered-button {
         height: 37px; 
-        margin-bottom: 16px;
+        margin-top: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -43,7 +44,7 @@ ui <-
         card(
           card_body(
             dataTableOutput("project_table"),
-            style = "width: auto; height: 800px;"
+            style = "width: auto; height: 750px;"
           )
         ),
         hidden(
@@ -58,14 +59,14 @@ ui <-
             ),
             fluidRow(
               id = "repo_topic_components",
-              style = "display: flex; align-items: flex-end;",
+              style = "display: flex; align-items: flex-start;",
               column(
                 width = 4,
                 uiOutput("repo_selector")
               ),
               column(
                 width = 4,
-                textInput("topic", "Enter a topic to add:")
+                textInput(inputId = "topic", label = "Enter a topic to add:", width = "100%")
               ),
               column(
                 width = 3,
@@ -75,7 +76,7 @@ ui <-
             card(
               card_body(
                 dataTableOutput("repo_table"),
-                style = "width: auto; height: 800px;"
+                style = "width: auto; height: 750px;"
               )
             ),
             textOutput("status")
@@ -255,13 +256,16 @@ server <- function(input, output, session) {
       req_repos <- GET("https://api.github.com/user/repos", config(token = github_token()))
       repos <- content(req_repos)
       repo_names <- sapply(repos, function(x) x$name)
-      selectInput(inputId = "repo", 
+      pickerInput(inputId = "repo", 
                   label = "Select a repository to tag:", 
                   choices = repo_names,
                   multiple = TRUE,
-                  selectize = FALSE,
-                  size = 1
-                 )
+                  options = 
+                    pickerOptions(
+                      container = "body", 
+                      selectedTextFormat = "count > 3"),
+                      width = "100%"
+                    )
     }
   })
   
@@ -308,7 +312,7 @@ server <- function(input, output, session) {
     selected_repo_row <- input$repo_table_rows_selected
     if (length(selected_repo_row) > 0) {
       repo_row_data <- user_repos()[selected_repo_row, 'Name', drop = TRUE]
-      updateSelectInput(session, "repo", selected = repo_row_data)
+      updatePickerInput(session, "repo", selected = repo_row_data)
     }
   })
 }
