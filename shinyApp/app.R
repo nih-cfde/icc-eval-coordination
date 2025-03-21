@@ -87,16 +87,27 @@ ui <-
 ## Server
 server <- function(input, output, session) {
   # Helper Functions
-  ## Replace NULL
+  #' Replace NULL
+  #' 
+  #' @description
+  #' Replace NULL values in a list with NA
+  #' @param x A list
   replace_null <- function(x) {
     lapply(x, function(y) if (is.null(y)) NA else y)
   }
-  ## Add Topics
-  ## This is a 3 step process as adding individual topics is not supported by GitHub API. In this way,
-  ## any existing repository topics are preserved.
-  ### 1. GET existing topics
-  ### 2. Append new topic and format
-  ### 3. PUT all topics
+  #' Add Topic
+  #' 
+  #' @description
+  #' A wrapper for the GitHub API endpoint that adds a repository topic
+  #' @details
+  #' This is a 3 step process as adding individual topics is not supported by GitHub API. In this way,
+  #' any existing repository topics are preserved.
+  #'   1. GET existing topics
+  #'   2. Append new topic and format
+  #'   3. PUT all topics
+  #' @param user A GitHub username
+  #' @param repo The repository to add a topic to
+  #' @param topic The topic to add
   add_topic <- function(user, repo, topic) {
     ### Get Existing Repository Topics
     get_topics <- GET(
