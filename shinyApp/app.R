@@ -1,9 +1,10 @@
 library(shiny)
+library(shinyjs)
 library(bslib)
 library(httr)
 library(tibble)
 library(jsonlite)
-library(shinyjs)
+library(purrr)
 library(DT)
 
 if (interactive()) {
@@ -34,7 +35,6 @@ ui <-
         verbatimTextOutput("user_info")
       ),
       page_fluid(
-        textOutput("status"),
         h4('NIH Project Locator'),
         p("If you already know your NIH Core Project number, great! You can sign-in with your GitHub credentials and
           tag related repositories below. If not, try searching for your project using the table below. You can also 
@@ -76,7 +76,8 @@ ui <-
                 dataTableOutput("repo_table"),
                 style = "width: auto; height: 800px;"
               )
-            )
+            ),
+            textOutput("status")
           )
         )
       )
@@ -85,9 +86,45 @@ ui <-
 
 ## Server
 server <- function(input, output, session) {
-  # Helper Function
+  # Helper Functions
+  ## Replace NULL
   replace_null <- function(x) {
     lapply(x, function(y) if (is.null(y)) NA else y)
+  }
+  ## Add Topics
+  ## This is a 3 step process as adding individual topics is not supported by GitHub API. In this way,
+  ## any existing repository topics are preserved.
+  ### 1. GET existing topics
+  ### 2. Append new topic and format
+  ### 3. PUT all topics
+  add_topic <- function(user, repo, topic) {
+    ### Get Existing Repository Topics
+    get_topics <- GET(
+      url = glue::glue("https://api.github.com/repos/{user}/{repo}/topics"),
+      add_headers("Accept: application/vnd.github+json"),
+      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
+      add_headers("X-GitHub-Api-Version: 2022-11-28")
+    )
+    ### Process, appending new topic
+    existing_topics <- content(get_topics)$names
+    all_topics <- toJSON(list(names = append(existing_topics, topic)), auto_unbox = TRUE)
+    
+    ### Send it!
+    put_topics <- PUT(
+      url = glue::glue("https://api.github.com/repos/{user}/{repo}/topics"),
+      add_headers("Accept: application/vnd.github+json"),
+      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
+      add_headers("X-GitHub-Api-Version: 2022-11-28"),
+      body = all_topics,
+      encode = "json"
+    )
+    status <- if (status_code(put_topics) == 200) {
+      "Topic added successfully!"
+      } else {
+        "Failed to add topic."
+        }
+    Sys.sleep(1) ## No running
+    return(status)
   }
 
   # GitHub OAuth App
@@ -164,46 +201,19 @@ server <- function(input, output, session) {
                   label = "Select a repository to tag:", 
                   choices = repo_names,
                   multiple = TRUE,
-                  selectize = FALSE
+                  selectize = FALSE,
+                  size = 1
                  )
     }
   })
   
   # Add Topic
-  ## This is a 3 step process as adding individual topics is not supported by GitHub API. In this way,
-  ## any existing repository topics are preserved.
-  ### 1. GET existing topics
-  ### 2. Append new topic and format
-  ### 3. PUT all topics
   observeEvent(input$add_topic, {
-    ### Get Existing Repository Topics
-    get_topics <- GET(
-      url = glue::glue("https://api.github.com/repos/{user_data()$login}/{input$repo}/topics"),
-      add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
-      add_headers("X-GitHub-Api-Version: 2022-11-28")
-    )
-    ### Process, appending new topic
-    topics <- content(get_topics)$names
-    all_topics <- toJSON(list(names = append(topics, input$topic)), auto_unbox = TRUE)
-    
-    ### Send it!
-    put_topics <- PUT(
-      url = glue::glue("https://api.github.com/repos/{user_data()$login}/{input$repo}/topics"),
-      add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
-      add_headers("X-GitHub-Api-Version: 2022-11-28"),
-      body = all_topics,
-      encode = "json"
-    )
-
+    ## Add topic to all selected repos
+    put_status <- map(.x = input$repo, ~add_topic(user = user_data()$login, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
     output$status <- renderText({
-      if (status_code(put_topics) == 200) {
-        "Topic added successfully!"
-        } else {
-          "Failed to add topic."
-        }
+      paste(put_status, sep = ",")
     })
   })
   
