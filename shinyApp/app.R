@@ -3,6 +3,7 @@ library(shinyjs)
 library(bslib)
 library(httr)
 library(tibble)
+library(glue)
 library(jsonlite)
 library(purrr)
 library(DT)
@@ -86,7 +87,7 @@ ui <-
 
 ## Server
 server <- function(input, output, session) {
-  # Helper Functions
+  # Helper Functions ----
   #' Replace NULL
   #' 
   #' @description
@@ -138,28 +139,73 @@ server <- function(input, output, session) {
     return(status)
   }
 
-  # GitHub OAuth App
+  # GitHub OAuth ----
+  ## Prep: Allow redirect to GitHub for auth if JS configured to prevent
+  allow_nav_jscode <- 'window.onbeforeunload = null;'
+  ## Monitor url bar for auth, store as params
+  params <- reactive({ parseQueryString(isolate(session$clientData$url_search)) })
+  github_auth <- reactiveVal('no')
+  ## When auth code, report authorized
+  observeEvent(params(), {
+    req(params()$code) 
+    github_auth('yes')
+    })
+  ## Client URL Information
+  protocol <- isolate(session$clientData$url_protocol)
+  hostname <- if (isolate(session$clientData$url_hostname) == '127.0.0.1') {
+    'localhost'
+    } else { isolate(session$clientData$url_hostname)
+      }
+  port <- isolate(session$clientData$url_port)
+  pathname <- isolate(session$clientData$url_pathname)
+  client_url <- if(is.null(port) | port == '') {
+    glue::glue('{protocol}//{hostname}{pathname}')
+    } else {
+      glue::glue('{protocol}//{hostname}:{port}{pathname}')
+      }
+  ## GitHub OAuth App 
   app <- oauth_app(appname = "github", 
                    key = Sys.getenv('onboard_helper_client'), 
-                   secret = Sys.getenv('onboard_helper_secret')
+                   secret = Sys.getenv('onboard_helper_secret'), 
+                   redirect_uri = client_url
                   )
+  ## GitHub Endpoint/Redirects
+  # scopes <- "repo read:org" ##read:org may be required
+  api <- oauth_endpoints("github")
+  scopes <- "repo"
+  github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes)
+  redirect <- sprintf("location.replace(\"%s\");", github_auth_url)
+  redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
 
-  # Create Reactives to store GitHub Auth Token and User Data
+
+  
+  ## Wait for login, commence OAuth dance
+  observeEvent(input$login, {
+    shinyjs::runjs( HTML(allow_nav_jscode, redirect) ) ## TTYL. You'll be back
+  })
+
+  # Create and hold Authorization token
   github_token <- reactiveVal(NULL)
   user_data <- reactiveVal(NULL)
-  
-  # Wait for login, create access token
-  observeEvent(input$login, {
-    # scopes <- "repo read:org" ##read:org may be required
-    scopes <- "repo"
-    github_token(oauth2.0_token(oauth_endpoints("github"), app, scope = scopes, cache = FALSE))
+
+  observeEvent(github_auth, {
+    if(github_auth() == 'yes') {
+      github_token(
+        oauth2.0_token(endpoint = oauth_endpoints("github"),
+          app = app , 
+          credentials = oauth2.0_access_token(api, app, params()$code),
+          scope = scopes, 
+          cache = FALSE
+        )
+      )
     # Extract user information
     user_info <- GET("https://api.github.com/user", config(token = github_token()))
     user_data(content(user_info))
     output$user_info <- renderPrint({ user_data()$login })
     # Extract org information
     # org_info <- GET(glue::glue("https://api.github.com/{user_data()$login}/orgs"), config(token = github_token())) ##May require additional scopes
-    shinyjs::show("repo_selector")
+    shinyjs::show("repo_selector") 
+    }
   })
 
   # When toekn available, show repo UI components
