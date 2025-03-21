@@ -1,6 +1,7 @@
 library(shiny)
 library(bslib)
 library(httr)
+library(tibble)
 library(jsonlite)
 library(shinyjs)
 library(DT)
@@ -24,7 +25,9 @@ ui <-
         }
       ")
     ),
-    titlePanel("CFDE: Onboard Assist"),
+    titlePanel(title = "Common Fund Data Ecosystem: Onboard Helper", 
+               windowTitle = "Onboard Helper"
+              ),
     layout_sidebar(
       sidebar = sidebar(
         actionButton("login", "Sign in with GitHub", icon = icon("github")),
@@ -32,26 +35,50 @@ ui <-
       ),
       page_fluid(
         textOutput("status"),
-        dataTableOutput("project_table"),
-        fluidRow(
-          id = "repo_topic_components",
-          style = "display: flex; align-items: flex-end;",
-          column(
-            width = 4,
-            uiOutput("repo_selector")
-          ),
-          column(
-            width = 4,
-            textInput("topic", "Enter a topic to add:")
-          ),
-          column(
-            width = 3,
-            actionButton("add_topic", "Add Topic", style = "height: 35px;", class = "centered-button")
+        h4('NIH Project Locator'),
+        p("If you already know your NIH Core Project number, great! You can sign-in with your GitHub credentials and
+          tag related repositories below. If not, try searching for your project using the table below. You can also 
+          try searching by project keywords to help locate your core project number."),
+        card(
+          card_body(
+            dataTableOutput("project_table"),
+            style = "width: auto; height: 800px;"
           )
         ),
-        tableOutput("repo_table")
+        div(
+          id = "github_authorized_ui",
+          fluidRow(
+            id = "github_repo_instructions",
+            h4("GitHub Repositories"),
+            p("Select a repository to tag with your NIH Core Project number. Selections may be made from the dropdown, or
+              by clicking rows in the table below."
+            )
+          ),
+          fluidRow(
+            id = "repo_topic_components",
+            style = "display: flex; align-items: flex-end;",
+            column(
+              width = 4,
+              uiOutput("repo_selector")
+            ),
+            column(
+              width = 4,
+              textInput("topic", "Enter a topic to add:")
+            ),
+            column(
+              width = 3,
+              actionButton("add_topic", "Add Topic", style = "height: 35px;", class = "centered-button")
+            )
+          ),
+          card(
+            card_body(
+              dataTableOutput("repo_table"),
+              style = "width: auto; height: 800px;"
+            )
+          )
         )
       )
+    )
   )
 
 ## Server
@@ -88,9 +115,9 @@ server <- function(input, output, session) {
   # When toekn available, show repo UI components
   observe({
     if (is.null(github_token())) {
-      shinyjs::hide("repo_topic_components")
+      shinyjs::hide("github_authorized_ui")
       } else {
-        shinyjs::show("repo_topic_components")
+        shinyjs::show("github_authorized_ui")
         }
   })
   
@@ -105,17 +132,17 @@ server <- function(input, output, session) {
         filter = list(position = "top", clear = FALSE),             
         selection = "single",
         options = list(
-          scrollY = 600,
+          scrollY = 500,
           paging = FALSE,
           columnDefs = list(
             list(
               targets = c(5,6),
               searchable = TRUE,
               visible = FALSE
-              )
             )
           )
         )
+      )
   })
   observeEvent(input$project_table_rows_selected, {
     selected_row <- input$project_table_rows_selected
@@ -174,7 +201,7 @@ server <- function(input, output, session) {
   })
   
   ## Show all User GitHub Repos
-  output$repo_table <- renderTable({
+  output$repo_table <- renderDataTable({
     if (!is.null(github_token())) {
       req_repo_table <- GET("https://api.github.com/user/repos", config(token = github_token()))
       repos_table <- content(req_repo_table)
@@ -184,7 +211,17 @@ server <- function(input, output, session) {
       url <- sapply(repos_table, function(x) x$html_url)
       tibble::tibble(Name = name, 
                      Description = description,
-                     URL = url)
+                     URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
+                    ) %>% 
+        DT::datatable(
+          rownames = F,
+          escape = FALSE,
+          filter = list(position = "top", clear = FALSE),             
+          options = list(
+            scrollY = 500,
+            paging = FALSE
+          )
+        )
     }
   })
 }
