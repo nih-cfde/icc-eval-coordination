@@ -45,35 +45,37 @@ ui <-
             style = "width: auto; height: 800px;"
           )
         ),
-        div(
-          id = "github_authorized_ui",
-          fluidRow(
-            id = "github_repo_instructions",
-            h4("GitHub Repositories"),
-            p("Select a repository to tag with your NIH Core Project number. Selections may be made from the dropdown, or
-              by clicking rows in the table below."
-            )
-          ),
-          fluidRow(
-            id = "repo_topic_components",
-            style = "display: flex; align-items: flex-end;",
-            column(
-              width = 4,
-              uiOutput("repo_selector")
+        hidden(
+          div(
+            id = "github_authorized_ui",
+            fluidRow(
+              id = "github_repo_instructions",
+              h4("GitHub Repositories"),
+              p("Select a repository to tag with your NIH Core Project number. Selections may be made from the dropdown, or
+                by clicking rows in the table below."
+              )
             ),
-            column(
-              width = 4,
-              textInput("topic", "Enter a topic to add:")
+            fluidRow(
+              id = "repo_topic_components",
+              style = "display: flex; align-items: flex-end;",
+              column(
+                width = 4,
+                uiOutput("repo_selector")
+              ),
+              column(
+                width = 4,
+                textInput("topic", "Enter a topic to add:")
+              ),
+              column(
+                width = 3,
+                actionButton("add_topic", "Add Topic", style = "height: 35px;", class = "centered-button")
+              )
             ),
-            column(
-              width = 3,
-              actionButton("add_topic", "Add Topic", style = "height: 35px;", class = "centered-button")
-            )
-          ),
-          card(
-            card_body(
-              dataTableOutput("repo_table"),
-              style = "width: auto; height: 800px;"
+            card(
+              card_body(
+                dataTableOutput("repo_table"),
+                style = "width: auto; height: 800px;"
+              )
             )
           )
         )
@@ -114,10 +116,10 @@ server <- function(input, output, session) {
 
   # When toekn available, show repo UI components
   observe({
-    if (is.null(github_token())) {
-      shinyjs::hide("github_authorized_ui")
+    if (!is.null(github_token())) {
+      shinyjs::show("github_authorized_ui")
       } else {
-        shinyjs::show("github_authorized_ui")
+        shinyjs::hide("github_authorized_ui")
         }
   })
   
