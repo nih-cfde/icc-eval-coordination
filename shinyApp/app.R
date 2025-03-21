@@ -171,6 +171,7 @@ server <- function(input, output, session) {
         filter = list(position = "top", clear = FALSE),             
         selection = "single",
         options = list(
+          search = list(regex = TRUE),
           scrollY = 500,
           paging = FALSE,
           columnDefs = list(
@@ -239,6 +240,7 @@ server <- function(input, output, session) {
           escape = FALSE,
           filter = list(position = "top", clear = FALSE),             
           options = list(
+            search = list(regex = TRUE),
             scrollY = 500,
             paging = FALSE
           )
