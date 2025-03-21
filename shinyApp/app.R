@@ -13,22 +13,45 @@ if (interactive()) {
 ui <- 
   page_fluid(
     useShinyjs(),
-    title = "CFDE: Onboard Assist",
+    tags$style(
+      HTML("
+        .centered-button {
+        height: 37px; 
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+      ")
+    ),
     titlePanel("CFDE: Onboard Assist"),
     layout_sidebar(
       sidebar = sidebar(
-        actionButton("login", "Sign in with GitHub", icon = icon("github"))
+        actionButton("login", "Sign in with GitHub", icon = icon("github")),
+        verbatimTextOutput("user_info")
       ),
       page_fluid(
         textOutput("status"),
-        verbatimTextOutput("user_info"),
         dataTableOutput("project_table"),
-        uiOutput("repo_selector"),
-        textInput("topic", "Enter a topic to add"),
-        actionButton("add_topic", "Add Topic"),
+        fluidRow(
+          id = "repo_topic_components",
+          style = "display: flex; align-items: flex-end;",
+          column(
+            width = 4,
+            uiOutput("repo_selector")
+          ),
+          column(
+            width = 4,
+            textInput("topic", "Enter a topic to add:")
+          ),
+          column(
+            width = 3,
+            actionButton("add_topic", "Add Topic", style = "height: 35px;", class = "centered-button")
+          )
+        ),
         tableOutput("repo_table")
+        )
       )
-    ),
   )
 
 ## Server
@@ -60,6 +83,15 @@ server <- function(input, output, session) {
     # Extract org information
     # org_info <- GET(glue::glue("https://api.github.com/{user_data()$login}/orgs"), config(token = github_token())) ##May require additional scopes
     shinyjs::show("repo_selector")
+  })
+
+  # When toekn available, show repo UI components
+  observe({
+    if (is.null(github_token())) {
+      shinyjs::hide("repo_topic_components")
+      } else {
+        shinyjs::show("repo_topic_components")
+        }
   })
   
   # NIH Project Selector
@@ -93,13 +125,13 @@ server <- function(input, output, session) {
     }
   })
 
-  # Repo UI
+  # Repo Selector
   output$repo_selector <- renderUI({
     if (!is.null(github_token())) {
       req_repos <- GET("https://api.github.com/user/repos", config(token = github_token()))
       repos <- content(req_repos)
       repo_names <- sapply(repos, function(x) x$name)
-      selectInput("repo", "Select a repository to tag", choices = repo_names)
+      selectInput("repo", "Select a repository to tag:", choices = repo_names)
     }
   })
   
