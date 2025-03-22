@@ -1,12 +1,13 @@
+library(tidyverse)
+library(magrittr)
+library(jsonlite)
+library(httr)
+library(glue)
+library(gh)
 library(shiny)
 library(shinyjs)
 library(bslib)
 library(shinyWidgets)
-library(httr)
-library(tibble)
-library(glue)
-library(jsonlite)
-library(purrr)
 library(DT)
 
 if (interactive()) {
@@ -219,9 +220,16 @@ server <- function(input, output, session) {
   })
   
   # NIH Project Selector
-  projects <- read.csv('shinyApp/data/reporter-projects.csv')
+  projects <- reactive({
+    fromJSON(gh('GET https://raw.githubusercontent.com/nih-cfde/icc-eval-core/refs/heads/main/data/raw/reporter-projects.json')$message)$results %>% 
+    as_tibble() %>% 
+    unnest(organization) %>% 
+    mutate(project_detail_url = glue::glue("<a href='{project_detail_url}' target='_blank'>{project_detail_url}</a>")) %>% 
+    select(core_project_num, project_num, project_title, project_detail_url, org_name, terms, pref_terms)
+  })
+  
   output$project_table <- renderDataTable({
-    projects %>% 
+    projects() %>% 
       DT::datatable(
         rownames = F,
         colnames = c("Core Project Number", "Project Number", "Project Title", "Project Detail URL", "Organization"),
