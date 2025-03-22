@@ -166,8 +166,8 @@ server <- function(input, output, session) {
       }
   ## GitHub OAuth App 
   app <- oauth_app(appname = "github", 
-                   key = Sys.getenv('onboard_helper_client'), 
-                   secret = Sys.getenv('onboard_helper_secret'), 
+                   key = Sys.getenv("onboard_helper_githubApp_client"), 
+                   secret = Sys.getenv("onboard_helper_githubApp_secret"), 
                    redirect_uri = client_url
                   )
   ## GitHub Endpoint/Redirects
@@ -250,24 +250,56 @@ server <- function(input, output, session) {
     }
   })
 
-  # Repo Selector
-  output$repo_selector <- renderUI({
-    if (!is.null(github_token())) {
-      req_repos <- GET("https://api.github.com/user/repos", config(token = github_token()))
-      repos <- content(req_repos)
-      repo_names <- sapply(repos, function(x) x$name)
-      pickerInput(inputId = "repo", 
-                  label = "Select a repository to tag:", 
-                  choices = repo_names,
-                  multiple = TRUE,
-                  options = 
-                    pickerOptions(
-                      container = "body", 
-                      selectedTextFormat = "count > 3"),
-                      width = "100%"
-                    )
-    }
+  # GET GitHub Repositories ----
+  ## Create Reactive Repo Expression
+  repos <- reactive({
+    if(!is.null(github_token())) {
+      all_repos <- list()
+      page <- 1
+      per_page <- 100
+      repeat {
+        ### Get first page of 100 results and iterate
+        repo_url <- paste0("https://api.github.com/user/repos?per_page=", per_page, "&page=", page)
+        req_repos <- GET(repo_url, config(token = github_token()))
+        content_repos <- content(req_repos) 
+        ### Append new page to previous list
+        all_repos <- c(all_repos, content_repos)
+        #### Check if there are fewer than `per_page` items in the response
+        if (length(content_repos) < per_page) {
+          break
+        }
+        #### Increment the page number
+        page <- page + 1
+      }
+      name <- sapply(all_repos, function(x) x$name)
+      description <- unlist(replace_null(sapply(all_repos, function(x) x$description)))
+      url <- sapply(all_repos, function(x) x$html_url)
+      formatted_repos <-
+        tibble(
+          Name = name, 
+          Description = description,
+          URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
+        )
+    return(formatted_repos)
+    } else {
+      return(NULL)
+      }
   })
+  
+  ## Repo Selector
+  output$repo_selector <- renderUI({
+    repo_names <- repos()[["Name"]]
+    pickerInput(inputId = "repo", 
+                label = "Select a repository to tag:", 
+                choices = repo_names,
+                multiple = TRUE,
+                options = 
+                  pickerOptions(
+                    container = "body", 
+                    selectedTextFormat = "count > 3"),
+                    width = "100%"
+                  )
+    })
   
   # Add Topic
   observeEvent(input$add_topic, {
@@ -280,22 +312,9 @@ server <- function(input, output, session) {
   })
   
   ## Show all User GitHub Repos
-  user_repos <- reactiveVal(NULL)
   output$repo_table <- renderDataTable({
-    if (!is.null(github_token())) {
-      req_repo_table <- GET("https://api.github.com/user/repos", config(token = github_token()))
-      repos_table <- content(req_repo_table)
-      ## Process Repo Info for Display
-      name <- sapply(repos_table, function(x) x$name)
-      description <- unlist(replace_null(sapply(repos_table, function(x) x$description)))
-      url <- sapply(repos_table, function(x) x$html_url)
-      user_repos(
-        tibble(Name = name, 
-          Description = description,
-          URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
-        )
-      ) 
-      user_repos() %>% 
+    req(repos())
+    repos() %>% 
         DT::datatable(
           rownames = F,
           escape = FALSE,
@@ -306,12 +325,11 @@ server <- function(input, output, session) {
             paging = FALSE
           )
         )
-    }
   })
   observeEvent(input$repo_table_rows_selected, {
     selected_repo_row <- input$repo_table_rows_selected
     if (length(selected_repo_row) > 0) {
-      repo_row_data <- user_repos()[selected_repo_row, 'Name', drop = TRUE]
+      repo_row_data <- repos()[selected_repo_row, 'Name', drop = TRUE]
       updatePickerInput(session, "repo", selected = repo_row_data)
     }
   })
