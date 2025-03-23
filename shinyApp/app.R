@@ -266,7 +266,7 @@ server <- function(input, output, session) {
   observeEvent(input$project_table_rows_selected, {
     selected_row <- input$project_table_rows_selected
     if (length(selected_row) > 0) {
-      row_data <- projects[selected_row, 'core_project_num']
+      row_data <- projects()[selected_row, 'core_project_num']
       updateTextInput(session, "topic", value = paste(row_data, collapse = ", "))
     }
   })
