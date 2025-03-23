@@ -52,8 +52,8 @@ ui <-
           searching by project keywords to help locate your Core Project Number."),
         card(
           card_body(
-            dataTableOutput("project_table"),
-            style = "width: auto; height: 750px;"
+            min_height = '200px', 
+            div(dataTableOutput("project_table"))
           )
         ),
         hidden(
@@ -84,8 +84,8 @@ ui <-
             ),
             card(
               card_body(
-                dataTableOutput("repo_table"),
-                style = "width: auto; height: 750px;"
+                min_height = '200px',
+                div(dataTableOutput("repo_table"))
               )
             ),
             textOutput("status")
@@ -251,7 +251,7 @@ server <- function(input, output, session) {
         selection = "single",
         options = list(
           search = list(regex = TRUE),
-          scrollY = 500,
+          scrollY = 250,
           paging = FALSE,
           columnDefs = list(
             list(
@@ -352,7 +352,7 @@ server <- function(input, output, session) {
           filter = list(position = "top", clear = FALSE),             
           options = list(
             search = list(regex = TRUE),
-            scrollY = 500,
+            scrollY = 250,
             paging = FALSE,
             columnDefs = list(
               list(
