@@ -330,9 +330,12 @@ server <- function(input, output, session) {
   observeEvent(input$add_topic, {
     ## Add topic to all selected repos
     repo_owner <- repos() %>% 
-      filter(full_name == input$repo) %>% 
+      filter(full_name %in% input$repo) %>% 
       pull(Owner)
-    put_status <- map2(.x = input$repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic))
+    repo <- repos() %>% 
+      filter(full_name %in% input$repo) %>% 
+      pull(Repo)
+    put_status <- map2(.x = repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
     output$status <- renderText({
       paste(put_status, sep = ",")
@@ -345,7 +348,6 @@ server <- function(input, output, session) {
     repos() %>% 
         DT::datatable(
           rownames = F,
-          colnames = c("Owner", "Repo", "Description", "ULR"),
           escape = FALSE,
           filter = list(position = "top", clear = FALSE),             
           options = list(
