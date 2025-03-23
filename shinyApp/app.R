@@ -279,15 +279,17 @@ server <- function(input, output, session) {
         page <- page + 1
       }
       owner <- sapply(all_repos, function(x) x$owner$login)
-      name <- sapply(all_repos, function(x) x$name)
+      repo <- sapply(all_repos, function(x) x$name)
       description <- unlist(replace_null(sapply(all_repos, function(x) x$description)))
       url <- sapply(all_repos, function(x) x$html_url)
+      full_name <- sapply(all_repos, function(x) x$full_name)
       formatted_repos <-
         tibble(
           Owner = owner,
-          Name = name, 
+          Repo = repo, 
           Description = description,
-          URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
+          URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>"),
+          full_name = full_name
         )
     return(formatted_repos)
     } else {
@@ -297,7 +299,7 @@ server <- function(input, output, session) {
   
   ## Repo Selector
   output$repo_selector <- renderUI({
-    repo_names <- repos()[["Name"]]
+    repo_names <- repos()[["full_name"]]
     pickerInput(inputId = "repo", 
                 label = "Select a repository to tag:", 
                 choices = repo_names,
@@ -314,7 +316,7 @@ server <- function(input, output, session) {
   observeEvent(input$add_topic, {
     ## Add topic to all selected repos
     repo_owner <- repos() %>% 
-      filter(Name == input$repo) %>% 
+      filter(Repo == input$repo) %>% 
       pull(Owner)
     put_status <- map(.x = input$repo, ~add_topic(owner = repo_owner, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
@@ -329,19 +331,27 @@ server <- function(input, output, session) {
     repos() %>% 
         DT::datatable(
           rownames = F,
+          colnames = c("Owner", "Repo", "Description", "ULR"),
           escape = FALSE,
           filter = list(position = "top", clear = FALSE),             
           options = list(
             search = list(regex = TRUE),
             scrollY = 500,
-            paging = FALSE
+            paging = FALSE,
+            columnDefs = list(
+              list(
+                targets = c(4),
+                searchable = TRUE,
+                visible = FALSE
+              )
+            )
           )
         )
   })
   observeEvent(input$repo_table_rows_selected, {
     selected_repo_row <- input$repo_table_rows_selected
     if (length(selected_repo_row) > 0) {
-      repo_row_data <- repos()[selected_repo_row, 'Name', drop = TRUE]
+      repo_row_data <- repos()[selected_repo_row, 'full_name', drop = TRUE]
       updatePickerInput(session, "repo", selected = repo_row_data)
     }
   })
