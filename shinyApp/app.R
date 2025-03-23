@@ -46,6 +46,10 @@ ui <-
           ), 
       ),
       page_fluid(
+        h4('Getting Started'),
+        p('If you want to sign in with GitHub and allow this app to add NIH Core Project Numbers as topics on your behalf, 
+          first please install the ', a("CFDE GitHub App", href = "https://github.com/apps/common-fund-data-ecosystem-cfde"), 
+          ' to your organization or repositories.'),
         h4('NIH Project Locator'),
         p("If you already know your NIH Core Project Number, great! You can sign-in with your GitHub credentials and
           tag related repositories below. If not, try searching for your project using the table. You can also try 
