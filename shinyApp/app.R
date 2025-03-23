@@ -8,6 +8,7 @@ library(shiny)
 library(shinyjs)
 library(bslib)
 library(shinyWidgets)
+library(shinycssloaders)
 library(DT)
 
 if (interactive()) {
@@ -57,7 +58,7 @@ ui <-
         card(
           card_body(
             min_height = '200px', 
-            div(dataTableOutput("project_table"))
+            div(dataTableOutput("project_table") %>% withSpinner())
           )
         ),
         hidden(
@@ -89,7 +90,7 @@ ui <-
             card(
               card_body(
                 min_height = '200px',
-                div(dataTableOutput("repo_table"))
+                div(dataTableOutput("repo_table") %>% withSpinner())
               )
             ),
             textOutput("status")
