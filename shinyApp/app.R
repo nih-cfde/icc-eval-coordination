@@ -316,9 +316,9 @@ server <- function(input, output, session) {
   observeEvent(input$add_topic, {
     ## Add topic to all selected repos
     repo_owner <- repos() %>% 
-      filter(Repo == input$repo) %>% 
+      filter(full_name == input$repo) %>% 
       pull(Owner)
-    put_status <- map(.x = input$repo, ~add_topic(owner = repo_owner, repo = .x, topic = input$topic))
+    put_status <- map2(.x = input$repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
     output$status <- renderText({
       paste(put_status, sep = ",")
