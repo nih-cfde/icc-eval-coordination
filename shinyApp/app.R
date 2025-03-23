@@ -111,12 +111,12 @@ server <- function(input, output, session) {
   #' @param user A GitHub username
   #' @param repo The repository to add a topic to
   #' @param topic The topic to add
-  add_topic <- function(user, repo, topic) {
+  add_topic <- function(owner, repo, topic, .token = github_token()$credentials$access_token) {
     ### Get Existing Repository Topics
     get_topics <- GET(
-      url = glue::glue("https://api.github.com/repos/{user}/{repo}/topics"),
+      url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
       add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
+      add_headers(Authorization = paste("Bearer", .token)),
       add_headers("X-GitHub-Api-Version: 2022-11-28")
     )
     ### Process, appending new topic
@@ -125,9 +125,9 @@ server <- function(input, output, session) {
     
     ### Send it!
     put_topics <- PUT(
-      url = glue::glue("https://api.github.com/repos/{user}/{repo}/topics"),
+      url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
       add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", github_token()$credentials$access_token)),
+      add_headers(Authorization = paste("Bearer", .token)),
       add_headers("X-GitHub-Api-Version: 2022-11-28"),
       body = all_topics,
       encode = "json"
@@ -172,10 +172,9 @@ server <- function(input, output, session) {
                    redirect_uri = client_url
                   )
   ## GitHub Endpoint/Redirects
-  # scopes <- "repo read:org" ##read:org may be required
   api <- oauth_endpoints("github")
-  scopes <- "repo"
-  github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes)
+  scopes <- "repo read:org"
+  github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes, redirect_uri = client_url)
   redirect <- sprintf("location.replace(\"%s\");", github_auth_url)
   redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
 
@@ -279,11 +278,13 @@ server <- function(input, output, session) {
         #### Increment the page number
         page <- page + 1
       }
+      owner <- sapply(all_repos, function(x) x$owner$login)
       name <- sapply(all_repos, function(x) x$name)
       description <- unlist(replace_null(sapply(all_repos, function(x) x$description)))
       url <- sapply(all_repos, function(x) x$html_url)
       formatted_repos <-
         tibble(
+          Owner = owner,
           Name = name, 
           Description = description,
           URL = glue::glue("<a href='{url}' target='_blank'>{url}</a>")
@@ -312,7 +313,10 @@ server <- function(input, output, session) {
   # Add Topic
   observeEvent(input$add_topic, {
     ## Add topic to all selected repos
-    put_status <- map(.x = input$repo, ~add_topic(user = user_data()$login, repo = .x, topic = input$topic))
+    repo_owner <- repos() %>% 
+      filter(Name == input$repo) %>% 
+      pull(Owner)
+    put_status <- map(.x = input$repo, ~add_topic(owner = repo_owner, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
     output$status <- renderText({
       paste(put_status, sep = ",")
