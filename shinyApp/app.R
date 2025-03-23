@@ -34,8 +34,16 @@ ui <-
               ),
     layout_sidebar(
       sidebar = sidebar(
-        actionButton("login", "Sign in with GitHub", icon = icon("github")),
-        verbatimTextOutput("user_info")
+        div(id = 'login_div', 
+          actionButton("login", "Sign in with GitHub", icon = icon("github"))
+        ),
+        hidden(
+          div(
+            id = 'logout_div', 
+              verbatimTextOutput("user_info"),
+              actionButton("logout", "Logout", icon = icon(name = 'sign-out-alt'))
+            )
+          ), 
       ),
       page_fluid(
         h4('NIH Project Locator'),
@@ -184,6 +192,12 @@ server <- function(input, output, session) {
   observeEvent(input$login, {
     shinyjs::runjs( HTML(allow_nav_jscode, redirect) ) ## TTYL. You'll be back
   })
+   ### When the "log out" button is pressed, reset the UI by redirecting to the base url, minus the authorization code
+   observeEvent(input$logout, {
+    shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
+    shinyjs::hide(id = 'logout_div')
+    shinyjs::show(id = 'login_div')
+  })
 
   # Create and hold Authorization token
   github_token <- reactiveVal(NULL)
@@ -203,8 +217,8 @@ server <- function(input, output, session) {
     user_info <- GET("https://api.github.com/user", config(token = github_token()))
     user_data(content(user_info))
     output$user_info <- renderPrint({ user_data()$login })
-    # Extract org information
-    # org_info <- GET(glue::glue("https://api.github.com/{user_data()$login}/orgs"), config(token = github_token())) ##May require additional scopes
+    shinyjs::hide('login_div')
+    shinyjs::show('logout_div')
     shinyjs::show("repo_selector") 
     }
   })
