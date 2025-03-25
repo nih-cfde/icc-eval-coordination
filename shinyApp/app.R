@@ -30,21 +30,23 @@ ui <-
         }
       ")
     ),
-    titlePanel(title = "Common Fund Data Ecosystem: Onboard Helper", 
-               windowTitle = "Onboard Helper"
-              ),
+    titlePanel(
+      title = "Common Fund Data Ecosystem: Onboard Helper", 
+      windowTitle = "Onboard Helper"
+    ),
     layout_sidebar(
       sidebar = sidebar(
-        div(id = 'login_div', 
+        div(
+          id = 'login_div', 
           actionButton("login", "Sign in with GitHub", icon = icon("github"))
         ),
         hidden(
           div(
             id = 'logout_div', 
-              verbatimTextOutput("user_info"),
-              actionButton("logout", "Logout", icon = icon(name = 'sign-out-alt'))
-            )
-          ), 
+            verbatimTextOutput("user_info"),
+            actionButton("logout", "Logout", icon = icon(name = 'sign-out-alt'))
+          )
+        ), 
       ),
       page_fluid(
         h4('Getting Started'),
