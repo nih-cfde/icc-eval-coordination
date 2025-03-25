@@ -1,6 +1,10 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>Share extra info about your CFDE project</title>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,11 +48,11 @@
       }
 
       a {
-        color: dodgerblue;
+        color: royalblue;
       }
 
       a:hover {
-        color: slategray;
+        color: black;
       }
 
       b,
@@ -61,15 +65,39 @@
         padding: 2px 5px;
       }
 
+      sup {
+        font-size: 0.5rem;
+      }
+
       .anchor {
         margin-left: 10px;
         text-decoration: none;
-        opacity: 0.05;
+        opacity: 0.15;
       }
 
       :is(h1, h2, h3, h4):hover .anchor,
       .anchor:focus {
         opacity: 1;
+      }
+
+      .button {
+        display: block;
+        width: fit-content;
+        color: whitesmoke;
+        background: royalblue;
+        border-radius: 3px;
+        margin: 20px;
+        padding: 5px 10px;
+        text-decoration: none;
+      }
+
+      .button:hover {
+        background: black;
+        color: whitesmoke;
+      }
+
+      .button sup {
+        font-weight: 600;
       }
     </style>
   </head>
@@ -128,16 +156,16 @@
     <p>
       We only gather info about projects and share it with the NIH. The goal of
       this isn't to compare across projects, it's to help program staff
-      understand how activities in projects lead to increased impact.
+      understand how certain activities lead to increased impact.
     </p>
 
     <h3>Who can see this info?</h3>
 
     <p>
       The <em>extra info</em> we gather may be considered to be sensitive by
-      some. Because of this, we keep it private, with limited/privileged access.
-      If you'd like to see the extra info we've gathered for your project,
-      please <a href="#contact">contact us</a>.
+      some. Because of this, we keep it private with privileged access. If you'd
+      like to see the extra info we've gathered for your project, please
+      <a href="#contact">contact us</a>.
     </p>
 
     <p>
@@ -163,17 +191,15 @@
     <h3>What is the benefit?</h3>
 
     <p>
-      We know that
-      <em>one set of metrics can't fully represent your work</em>. Still, the
-      more you share, the fuller picture you can paint.
+      <em>One set of metrics can't fully represent your work</em>, but the more
+      you share the fuller picture you can paint.
     </p>
 
     <p>
-      Imagine you hold an event like a chalk talk where you discuss your work
-      and give people public links to it. You might see a marked spike in your
-      Google Analytics the week after the event. With the help of our info
-      gathering, the NIH could see the direct impact of that immediately and
-      conveniently.
+      Imagine you hold an event where you discuss your work and share public
+      links to it. You might see a spike in your Google Analytics the week after
+      the event. With the help of our info gathering, the NIH could see the
+      direct impact of that immediately and conveniently.
     </p>
 
     <h3>Can't this be automatic?</h3>
@@ -186,15 +212,15 @@
 
     <p>
       This page is about
-      <strong>extra info that we can't gather automatically</strong>. At
-      present, this just means we need you to manually tag some things with your
-      project numbers so we can associate them together.
+      <strong>extra info that we can't gather automatically</strong>. Currently,
+      this just means we need you to manually tag some things with your project
+      numbers so we can associate them together.
     </p>
 
     <p>
       We've tried to make this process as <em>easy and minimal as possible</em>.
       If you already know your project numbers, it should only take a few
-      minutes!
+      minutes.
     </p>
 
     <h3>How does it work?</h3>
@@ -209,9 +235,9 @@
     </p>
 
     <p>
-      Here is a high-level overview of what info we gather and where we gather
-      it from. All parts of this process are automatic, except parts marked with
-      ✍️ that need some manual action.
+      Here is a high-level overview of <strong>what info we gather</strong> and
+      <strong>where we gather it from</strong>. All parts of this process are
+      automatic, except parts marked with ✍️ which need some manual action.
     </p>
 
     <pre class="mermaid">
@@ -291,9 +317,28 @@
         linkStyle 6 white-space:nowrap;
     </pre>
 
+    <h2>Helper app</h2>
+
+    <p>
+      In an effort to make things even easier, we're working on a webapp that
+      can help you lookup your Common Fund project and quickly perform
+      <strong>some of</strong> the instructions below.
+    </p>
+
+    <a class="button" href="https://cu-dbmi.shinyapps.io/CFDE-All_Aboard/">
+      Helper App
+      <sup>alpha</sup>
+    </a>
+
+    <p>
+      This is still very early in development and has limitations. You'll still
+      have to follow the instructions below if you want to share everything.
+      Please test it to help us make improvements.
+    </p>
+
     <h2>Instructions</h2>
 
-    <p>How to share extra info about your Common Fund project.</p>
+    <p>How to share extra info about your Common Fund project, manually.</p>
 
     <h3>Software repositories</h3>
 
