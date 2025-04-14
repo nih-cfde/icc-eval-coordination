@@ -1,7 +1,7 @@
 library(tidyverse)
 library(magrittr)
 library(jsonlite)
-library(httr)
+library(httr2)
 library(glue)
 library(gh)
 library(shiny)
@@ -123,19 +123,25 @@ server <- function(input, output, session) {
   #'   1. GET existing topics
   #'   2. Append new topic and format
   #'   3. PUT all topics
-  #' @param user A GitHub username
+  #' @param owner A GitHub username
   #' @param repo The repository to add a topic to
   #' @param topic The topic to add
   add_topic <- function(owner, repo, topic, .token = github_token()$credentials$access_token) {
     ### Get Existing Repository Topics
-    get_topics <- GET(
-      url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
-      add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", .token)),
-      add_headers("X-GitHub-Api-Version: 2022-11-28")
-    )
+    # get_topics <- GET(
+    #   url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
+    #   add_headers("Accept: application/vnd.github+json"),
+    #   add_headers(Authorization = paste("Bearer", .token)),
+    #   add_headers("X-GitHub-Api-Version: 2022-11-28")
+    # )
+    get_topics_req <- request(glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>% 
+      req_auth_bearer_token(github_token()$access_token)
+    get_topics <- get_topics_req %>% 
+      req_perform() %>% 
+      resp_body_json()
     ### Process, appending new topic
-    existing_topics <- content(get_topics)$names
+    # existing_topics <- content(get_topics)$names
+    existing_topics <- get_topics$names
     all_topics <- toJSON(list(names = append(existing_topics, topic)), auto_unbox = TRUE)
     
     ### Send it!
@@ -147,7 +153,17 @@ server <- function(input, output, session) {
       body = all_topics,
       encode = "json"
     )
-    status <- if (status_code(put_topics) == 200) {
+
+# Create a request object
+put_topics_req <- request( glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>%
+  req_method("PUT") %>%
+  req_auth_bearer_token(github_token()$access_token) %>% 
+  req_body_raw(all_topics)
+
+put_topics <- put_topics_req %>% 
+  req_perform() 
+  
+    status <- if (put_topics$status_code == 200) {
       "Topic added successfully!"
       } else {
         "Failed to add topic."
@@ -159,14 +175,8 @@ server <- function(input, output, session) {
   # GitHub OAuth ----
   ## Prep: Allow redirect to GitHub for auth if JS configured to prevent
   allow_nav_jscode <- 'window.onbeforeunload = null;'
-  ## Monitor url bar for auth, store as params
-  params <- reactive({ parseQueryString(isolate(session$clientData$url_search)) })
   github_auth <- reactiveVal('no')
-  ## When auth code, report authorized
-  observeEvent(params(), {
-    req(params()$code) 
-    github_auth('yes')
-    })
+
   ## Client URL Information
   protocol <- isolate(session$clientData$url_protocol)
   hostname <- if (isolate(session$clientData$url_hostname) == '127.0.0.1') {
@@ -176,20 +186,39 @@ server <- function(input, output, session) {
   port <- isolate(session$clientData$url_port)
   pathname <- isolate(session$clientData$url_pathname)
   client_url <- if(is.null(port) | port == '') {
-    glue::glue('{protocol}//{hostname}{pathname}')
+    glue::glue('{protocol}//{hostname}{pathname}') %>% str_remove('/$')
     } else {
-      glue::glue('{protocol}//{hostname}:{port}{pathname}')
+      glue::glue('{protocol}//{hostname}:{port}{pathname}')%>% str_remove('/$')
       }
-  ## GitHub OAuth App 
-  app <- oauth_app(appname = "github", 
-                   key = Sys.getenv("onboard_helper_githubApp_client"), 
-                   secret = Sys.getenv("onboard_helper_githubApp_secret"), 
-                   redirect_uri = client_url
-                  )
+  
+  ## Monitor url bar for auth, store as params
+  params <- reactive({ parseQueryString(isolate(session$clientData$url_search)) })
+
+  ## When auth code, report authorized
+  observeEvent(params(), {
+    req(params()$code) 
+    github_auth('yes')
+    })
+
+  ## GitHub App Client 
+  github_client <- function(){
+    app <- oauth_client(
+      id = 'Iv23liIdOH9m46Wj8Bn6', 
+      token_url = "https://github.com/login/oauth/access_token",
+      secret = obfuscated("FZHOr1UHjYIsw0b8bx0kEZTB82j9CJ_5TatbnZlLiXLSnuOn5Fx2y_KhMF-xun66-ft4xL--GOA"), 
+      name = "github"
+    )  
+  }
+  
   ## GitHub Endpoint/Redirects
-  api <- oauth_endpoints("github")
   scopes <- "repo read:org"
-  github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes, redirect_uri = client_url)
+  # github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes, redirect_uri = client_url)
+  github_auth_url <- httr2::oauth_flow_auth_code_url(
+    client = github_client(), 
+    auth_url = "https://github.com/login/oauth/authorize", 
+    redirect_uri = client_url, 
+    scope = scopes
+  )
   redirect <- sprintf("location.replace(\"%s\");", github_auth_url)
   redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
 
@@ -213,22 +242,33 @@ server <- function(input, output, session) {
   observeEvent(github_auth, {
     if(github_auth() == 'yes') {
       github_token(
-        oauth2.0_token(endpoint = oauth_endpoints("github"),
-          app = app , 
-          credentials = oauth2.0_access_token(api, app, params()$code),
-          scope = scopes, 
-          cache = FALSE
-        )
+        request(github_client()$token_url) %>%
+          req_method('POST') %>% 
+          req_headers(Accept = "application/json") %>% 
+          req_body_form(client_id = 'Iv23liIdOH9m46Wj8Bn6', 
+                        client_secret = Sys.getenv('onboard_helper_githubApp_secret'), 
+                        code = params()$code, 
+                        redirect_uri = client_url) %>%
+          req_perform() %>% 
+          resp_body_json()
       )
+      
     # Extract user information
-    user_info <- GET("https://api.github.com/user", config(token = github_token()))
-    user_data(content(user_info))
+    user_info_req <- request("https://api.github.com/user") %>% 
+      req_auth_bearer_token(github_token()$access_token)
+    user_info <- user_info_req %>% 
+      req_perform() %>% 
+      resp_body_json()
+      
+    browser()
+
+    user_data(user_info)
     output$user_info <- renderPrint({ user_data()$login })
     shinyjs::hide('login_div')
     shinyjs::show('logout_div')
     shinyjs::show("repo_selector") 
     }
-  })
+})
 
   # When toekn available, show repo UI components
   observe({
