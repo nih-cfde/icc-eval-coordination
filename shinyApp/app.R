@@ -127,12 +127,6 @@ server <- function(input, output, session) {
   #' @param topic The topic to add
   add_topic <- function(owner, repo, topic, .token = github_token()$credentials$access_token) {
     ### Get Existing Repository Topics
-    # get_topics <- GET(
-    #   url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
-    #   add_headers("Accept: application/vnd.github+json"),
-    #   add_headers(Authorization = paste("Bearer", .token)),
-    #   add_headers("X-GitHub-Api-Version: 2022-11-28")
-    # )
     get_topics_req <- request(glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>% 
       req_auth_bearer_token(github_token()$access_token)
     get_topics <- get_topics_req %>% 
@@ -144,23 +138,13 @@ server <- function(input, output, session) {
     all_topics <- toJSON(list(names = append(existing_topics, topic)), auto_unbox = TRUE)
     
     ### Send it!
-    put_topics <- PUT(
-      url = glue::glue("https://api.github.com/repos/{owner}/{repo}/topics"),
-      add_headers("Accept: application/vnd.github+json"),
-      add_headers(Authorization = paste("Bearer", .token)),
-      add_headers("X-GitHub-Api-Version: 2022-11-28"),
-      body = all_topics,
-      encode = "json"
-    )
+    put_topics_req <- request( glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>%
+      req_method("PUT") %>%
+      req_auth_bearer_token(github_token()$access_token) %>% 
+      req_body_raw(all_topics)
 
-# Create a request object
-put_topics_req <- request( glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>%
-  req_method("PUT") %>%
-  req_auth_bearer_token(github_token()$access_token) %>% 
-  req_body_raw(all_topics)
-
-put_topics <- put_topics_req %>% 
-  req_perform() 
+    put_topics <- put_topics_req %>% 
+      req_perform() 
   
     status <- if (put_topics$status_code == 200) {
       "Topic added successfully!"
@@ -211,7 +195,6 @@ put_topics <- put_topics_req %>%
   
   ## GitHub Endpoint/Redirects
   scopes <- "repo read:org"
-  # github_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes, redirect_uri = client_url)
   github_auth_url <- httr2::oauth_flow_auth_code_url(
     client = github_client(), 
     auth_url = "https://github.com/login/oauth/authorize", 
@@ -258,8 +241,6 @@ put_topics <- put_topics_req %>%
     user_info <- user_info_req %>% 
       req_perform() %>% 
       resp_body_json()
-      
-    browser()
 
     user_data(user_info)
     output$user_info <- renderPrint({ user_data()$login })
@@ -331,12 +312,15 @@ put_topics <- put_topics_req %>%
       repeat {
         ### Get first page of 100 results and iterate
         repo_url <- paste0("https://api.github.com/user/repos?per_page=", per_page, "&page=", page)
-        req_repos <- GET(repo_url, config(token = github_token()))
-        content_repos <- content(req_repos) 
+        repos_req <- request(repo_url) %>% 
+          req_auth_bearer_token(github_token()$access_token)
+        repo_content <- repos_req %>% 
+          req_perform() %>% 
+          resp_body_json()
         ### Append new page to previous list
-        all_repos <- c(all_repos, content_repos)
+        all_repos <- c(all_repos, repo_content)
         #### Check if there are fewer than `per_page` items in the response
-        if (length(content_repos) < per_page) {
+        if (length(repo_content) < per_page) {
           break
         }
         #### Increment the page number
