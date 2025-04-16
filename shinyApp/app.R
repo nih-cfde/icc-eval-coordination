@@ -125,27 +125,34 @@ server <- function(input, output, session) {
   #' @param owner A GitHub username
   #' @param repo The repository to add a topic to
   #' @param topic The topic to add
-  add_topic <- function(owner, repo, topic, .token = github_token()$credentials$access_token) {
+  add_topic <- function(owner, repo, topic, .token = github_token()$access_token) {
     ### Get Existing Repository Topics
     get_topics_req <- request(glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>% 
-      req_auth_bearer_token(github_token()$access_token)
+      req_auth_bearer_token(.token)
     get_topics <- get_topics_req %>% 
       req_perform() %>% 
       resp_body_json()
     ### Process, appending new topic
-    # existing_topics <- content(get_topics)$names
     existing_topics <- get_topics$names
     all_topics <- toJSON(list(names = append(existing_topics, topic)), auto_unbox = TRUE)
     
     ### Send it!
     put_topics_req <- request( glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>%
       req_method("PUT") %>%
-      req_auth_bearer_token(github_token()$access_token) %>% 
+      req_auth_bearer_token(.token) %>% 
       req_body_raw(all_topics)
 
-    put_topics <- put_topics_req %>% 
-      req_perform() 
-  
+    put_topics <- 
+      tryCatch(
+        {
+          put_topics <- put_topics_req %>% 
+            req_perform() 
+        },
+          error = function(cond) {
+            put_topics <- list(status_code = 422)
+        }
+      )
+    
     status <- if (put_topics$status_code == 200) {
       "Topic added successfully!"
       } else {
