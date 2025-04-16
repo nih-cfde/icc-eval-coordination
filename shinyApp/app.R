@@ -235,8 +235,8 @@ server <- function(input, output, session) {
           req_method('POST') %>% 
           req_headers(Accept = "application/json") %>% 
           req_body_multipart(
-            client_id = 'Iv23liIdOH9m46Wj8Bn6', 
-            client_secret = obfuscated("FZHOr1UHjYIsw0b8bx0kEZTB82j9CJ_5TatbnZlLiXLSnuOn5Fx2y_KhMF-xun66-ft4xL--GOA"), 
+            client_id = github_client()$id, 
+            client_secret = github_client()$secret, 
             code = params()$code, 
             redirect_uri = client_url) %>%
           req_perform() %>% 
