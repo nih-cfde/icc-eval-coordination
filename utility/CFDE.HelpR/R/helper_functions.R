@@ -21,13 +21,14 @@ replace_null <- function(x) {
 #' @param owner A GitHub username
 #' @param repo The repository to add a topic to
 #' @param topic The topic to add
+#' @param .token A GitHub Access token with appropriate permissions
 #' 
 #' @importFrom glue glue
 #' @importFrom httr2 request req_auth_bearer_token req_body_raw req_method req_perform resp_body_json
 #' @importFrom jsonlite toJSON
 #' @importFrom magrittr %>% 
 #' 
-  add_topic <- function(owner, repo, topic, .token = github_token()$access_token) {
+  add_topic <- function(owner, repo, topic, .token = NULL) {
     ### Get Existing Repository Topics
     get_topics_req <- request(glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>% 
       req_auth_bearer_token(.token)

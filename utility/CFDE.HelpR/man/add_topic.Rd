@@ -4,7 +4,7 @@
 \alias{add_topic}
 \title{Add Topic}
 \usage{
-add_topic(owner, repo, topic, .token = github_token()$access_token)
+add_topic(owner, repo, topic, .token = NULL)
 }
 \arguments{
 \item{owner}{A GitHub username}
@@ -12,6 +12,8 @@ add_topic(owner, repo, topic, .token = github_token()$access_token)
 \item{repo}{The repository to add a topic to}
 
 \item{topic}{The topic to add}
+
+\item{.token}{A GitHub Access token with appropriate permissions}
 }
 \description{
 A wrapper for the GitHub API endpoint that adds a repository topic

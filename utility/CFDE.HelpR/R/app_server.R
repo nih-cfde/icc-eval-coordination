@@ -236,7 +236,7 @@ app_server <- function(input, output, session) {
     repo <- repos() %>% 
       filter(full_name %in% input$repo) %>% 
       pull(.data$Repo)
-    put_status <- map2(.x = repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic))
+    put_status <- map2(.x = repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic, .token = github_token()$access_token))
     ## Verify the status code of the topic addition
     output$status <- renderText({
       paste(put_status, sep = ",")
