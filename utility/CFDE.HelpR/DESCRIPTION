@@ -13,9 +13,24 @@ License: BSD_3_clause + file LICENSE
 URL: https://github.com/icc-eval-coordination/tree/main/utility/CFDE.HelpR
 BugReports: https://github.com//icc-eval-coordination/issues
 Imports: 
+    bslib,
     config,
+    dplyr,
+    DT,
+    glue,
     golem,
-    shiny
+    httr2,
+    jsonlite,
+    magrittr,
+    purrr,
+    rlang,
+    shiny,
+    shinycssloaders,
+    shinyjs,
+    shinyWidgets,
+    stringr,
+    tibble,
+    tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2

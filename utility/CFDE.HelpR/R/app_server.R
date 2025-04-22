@@ -3,67 +3,24 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' 
+#' @importFrom bslib card card_body sidebar
+#' @importFrom dplyr filter mutate pull select
+#' @importFrom DT DTOutput renderDT
+#' @importFrom httr2 obfuscated oauth_client req_headers resp_body_string req_body_multipart
+#' @importFrom jsonlite fromJSON
+#' @importFrom magrittr extract2
+#' @importFrom purrr map2
+#' @importFrom rlang .data
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom shinyWidgets pickerInput pickerOptions updatePickerInput
+#' @importFrom stringr str_remove
+#' @importFrom tibble tibble
+#' @importFrom tidyr unnest
+#' 
 #' @noRd
+#' 
 app_server <- function(input, output, session) {
-  # Helper Functions ----
-  #' Replace NULL
-  #' 
-  #' @description
-  #' Replace NULL values in a list with NA
-  #' @param x A list
-  replace_null <- function(x) {
-    lapply(x, function(y) if (is.null(y)) NA else y)
-  }
-  #' Add Topic
-  #' 
-  #' @description
-  #' A wrapper for the GitHub API endpoint that adds a repository topic
-  #' @details
-  #' This is a 3 step process as adding individual topics is not supported by GitHub API. In this way,
-  #' any existing repository topics are preserved.
-  #'   1. GET existing topics
-  #'   2. Append new topic and format
-  #'   3. PUT all topics
-  #' @param owner A GitHub username
-  #' @param repo The repository to add a topic to
-  #' @param topic The topic to add
-  add_topic <- function(owner, repo, topic, .token = github_token()$access_token) {
-    ### Get Existing Repository Topics
-    get_topics_req <- request(glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>% 
-      req_auth_bearer_token(.token)
-    get_topics <- get_topics_req %>% 
-      req_perform() %>% 
-      resp_body_json()
-    ### Process, appending new topic
-    existing_topics <- get_topics$names
-    all_topics <- toJSON(list(names = append(existing_topics, topic)), auto_unbox = TRUE)
-    
-    ### Send it!
-    put_topics_req <- request( glue::glue("https://api.github.com/repos/{owner}/{repo}/topics")) %>%
-      req_method("PUT") %>%
-      req_auth_bearer_token(.token) %>% 
-      req_body_raw(all_topics)
-
-    put_topics <- 
-      tryCatch(
-        {
-          put_topics <- put_topics_req %>% 
-            req_perform() 
-        },
-          error = function(cond) {
-            put_topics <- list(status_code = 422)
-        }
-      )
-    
-    status <- if (put_topics$status_code == 200) {
-      "Topic added successfully!"
-      } else {
-        "Failed to add topic."
-        }
-    Sys.sleep(1) ## No running
-    return(status)
-  }
-
   # GitHub OAuth ----
   ## Prep: Allow redirect to GitHub for auth if JS configured to prevent
   allow_nav_jscode <- 'window.onbeforeunload = null;'
@@ -177,9 +134,9 @@ app_server <- function(input, output, session) {
       resp_body_string() %>% 
       fromJSON() %>% 
       extract2('results') %>% 
-      unnest(organization) %>% 
+      unnest(.data$organization) %>% 
       mutate(project_detail_url = glue::glue("<a href='{project_detail_url}' target='_blank'>{project_detail_url}</a>")) %>% 
-      select(core_project_num, project_num, project_title, project_detail_url, org_name, terms, pref_terms)
+      select(.data$core_project_num, .data$project_num, .data$project_title, .data$project_detail_url, .data$org_name, .data$terms, .data$pref_terms)
   })
   
   output$project_table <- renderDT({
@@ -275,10 +232,10 @@ app_server <- function(input, output, session) {
     ## Add topic to all selected repos
     repo_owner <- repos() %>% 
       filter(full_name %in% input$repo) %>% 
-      pull(Owner)
+      pull(.data$Owner)
     repo <- repos() %>% 
       filter(full_name %in% input$repo) %>% 
-      pull(Repo)
+      pull(.data$Repo)
     put_status <- map2(.x = repo, .y = repo_owner, ~add_topic(owner = .y, repo = .x, topic = input$topic))
     ## Verify the status code of the topic addition
     output$status <- renderText({

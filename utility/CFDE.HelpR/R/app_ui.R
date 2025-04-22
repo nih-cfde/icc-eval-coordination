@@ -3,6 +3,8 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @importFrom shinyjs useShinyjs hidden show
+#' @importFrom bslib page_fluid layout_sidebar
 #' @noRd
 app_ui <- function(request) {
   tagList(
