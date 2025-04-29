@@ -1,0 +1,41 @@
+Package: CFDE.HelpR
+Title: Common Fund Data Ecosystem - GitHub HelpR
+Version: 0.0.0.9000
+Authors@R: c(
+    person('David', 'Mayer', email = 'DBMI-SET@cuanschutz.edu', role = c('cre', 'aut'), comment = c(ORCID = "0000-0002-6056-9771"))
+    )
+Description: This package allows users to efficiently add Common Fund Data 
+    Ecosystem (CFDE) Core Project Numbers as topics to GitHub repositories within 
+    this ecosystem. By tagging repositories, you can share additional information 
+    about your Common Fund project, aiding the NIH in gaining a comprehensive 
+    understanding of your work.
+License: BSD_3_clause + file LICENSE
+URL: https://github.com/icc-eval-coordination/tree/main/utility/CFDE.HelpR
+BugReports: https://github.com//icc-eval-coordination/issues
+Imports: 
+    bslib,
+    config,
+    dplyr,
+    DT,
+    glue,
+    golem,
+    httr2,
+    jsonlite,
+    magrittr,
+    purrr,
+    rlang,
+    shiny,
+    shinycssloaders,
+    shinyjs,
+    shinyWidgets,
+    stringr,
+    tibble,
+    tidyr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
