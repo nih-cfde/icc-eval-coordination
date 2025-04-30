@@ -22,6 +22,7 @@ Imports:
     httr2,
     jsonlite,
     magrittr,
+    pkgload,
     purrr,
     rlang,
     shiny,
