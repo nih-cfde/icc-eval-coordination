@@ -58,7 +58,7 @@
 
       b,
       strong {
-        font-weight: 500;
+        font-weight: 600;
       }
 
       code {
@@ -381,7 +381,7 @@
           </li>
           <li>
             Under "Topics", type in your
-            <em>core project number</em>, e.g.
+            <em><strong>core</strong> project number</em>, e.g.
             <code>U54OD036472</code> (case-insensitive). Don't confuse this with
             a (sub) "project" number, which is longer, e.g.
             <code>1U54OD036472-01</code>.
@@ -443,15 +443,30 @@
       <li>
         "Tag" each property so we can associate it with a particular project.
         <ol>
+          <li>Go to "Admin" → "Data Display" → "Custom definitions".</li>
           <li>
-            Find "Key Events" from the "Admin" side menu,under "Data Display".
-          </li>
-          <li>
-            Create a new key event with the name
+            Create a new custom dimension with the name
             <code>cfde_XXX</code> (case-insensitive), where XXX is your
-            <em>core project number</em>, e.g. <code>cfde_U54OD036472</code>.
-            Don't confuse this with a (sub) "project" number, which is longer,
-            e.g. <code>1U54OD036472-01</code>.
+            <em><strong>core</strong> project number</em>, e.g.
+            <code>cfde_U54OD036472</code>. Don't confuse this with a (sub)
+            "project" number, which is longer, e.g.
+            <code>1U54OD036472-01</code>. The rest of the options can be set to
+            anything.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Alternative to step 3 (old method)
+        <ol>
+          <li>Go to "Admin" → "Data Display" → "Events".</li>
+          <li>
+            Create a new <strong>key</strong> event with the name
+            <code>cfde_XXX</code> (case-insensitive), where XXX is your
+            <em><strong>core</strong> project number</em>, e.g.
+            <code>cfde_U54OD036472</code>. Don't confuse this with a (sub)
+            "project" number, which is longer, e.g.
+            <code>1U54OD036472-01</code>. The rest of the options can be set to
+            anything.
           </li>
         </ol>
       </li>
