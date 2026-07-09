@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>Share extra info about your CFDE project</title>
@@ -164,9 +164,7 @@
 
     <p>
       The <em>extra info</em> we gather may be considered to be sensitive by
-      some. Because of this, we keep it private with privileged access. If you'd
-      like to see the extra info we've gathered for your project, please
-      <a href="#contact">contact us</a>.
+      some. Because of this, we keep it private with privileged access.
     </p>
 
     <p>
@@ -175,7 +173,22 @@
       <em>already publicly available</em>, so we do not keep them private.
     </p>
 
-    <p><a href="#how-does-it-work">See below for more details</a>.</p>
+    <p>
+      Our
+      <a href="https://cfde-icc-eval-core.uc.r.appspot.com/"
+        ><strong>public dashboard</strong></a
+      >
+      is available to anyone and shows an overview of all projects'
+      <em>standard info</em>. To view a project's <em>extra info</em>, you must
+      log in with your ORCID and be approved to view that project.
+    </p>
+
+    <p>
+      Select members of the NIH are privileged to see all projects'
+      <em>extra info</em>. To <strong>see your own project's</strong>
+      <em>extra info</em>, please <a href="#contact">contact us</a> to request
+      access.
+    </p>
 
     <h3>What is the benefit?</h3>
 
@@ -215,12 +228,11 @@
     <h3>How does it work?</h3>
 
     <p>
-      All of the <em>code</em> we use is publicly visible in the
+      For transparency, all of the <em>code</em> we use is publicly visible in
+      the
       <a href="https://github.com/nih-cfde/icc-eval-core"
         >GitHub nih-cfde/icc-eval-core repository</a
-      >, for transparency. For anything that is possibly sensitive, we run the
-      <em>exact same code that is publicly visible</em> (we checkout the code
-      directly from the public repo), except we store the results privately.
+      >, but the <em>results</em> of running it are kept privately.
     </p>
 
     <p>
@@ -274,56 +286,36 @@
             <i>scimagojr.com</i>
           "):::node
         end
-        
-        subgraph g3["Public repo"]
-          direction TB
-          n9("
-            <b>All gathered data</b>
-            Structured JSON
-          "):::node
-        end
-        subgraph g4["Private repo"]
+        n9("Structured JSON"):::node
+        n10("Database"):::node
+        n11("Backend"):::node
+        subgraph g3["Dashboard/API"]
           direction TB
           n10("
-            <b>All gathered data</b>
-            Structured JSON
+            <b>Standard Info</b>, all projects
+            Viewable by anyone
+          "):::node
+          n11("
+            <b>Extra Info</b>, per project
+            Only viewable by approved ORCIDs
           "):::node
         end
         g1:::group
         g2:::group
         g3:::group
-        g4:::group
         n1 --> n2
         n2 --> n3
         n3 --> n4
-        n5 -->|Get properties we have access to| n6
-        n7 -->|Search whole site for project # tags| n8
-        g1 -->|Linked to projects with tag #s| g3
-        g2 -->|Linked to projects with tag #s| g4
+        n5 --> |Get properties we have access to| n6
+        n7 --> |Search whole site for project # tags| n8
+        g1 --> |Linked to projects with tag #s| n9
+        g2 --> |Linked to projects with tag #s| n9
+        n9 --> g3
         classDef group color:black,stroke-width:0px,fill:aliceblue,white-space:nowrap
         classDef node color:black,stroke-width:0px,fill:#e0e8ef
         linkStyle default color:black,stroke:black
         linkStyle 6 white-space:nowrap;
     </pre>
-
-    <h2>Helper app</h2>
-
-    <p>
-      In an effort to make things even easier, we're working on a webapp that
-      can help you lookup your Common Fund project and quickly perform
-      <strong>some of</strong> the instructions below.
-    </p>
-
-    <a class="button" href="https://cu-dbmi.shinyapps.io/CFDE-All_Aboard/">
-      Helper App
-      <sup>alpha</sup>
-    </a>
-
-    <p>
-      This is still very early in development and has limitations. You'll still
-      have to follow the instructions below if you want to share everything.
-      Please test it to help us make improvements.
-    </p>
 
     <h2>Instructions</h2>
 
