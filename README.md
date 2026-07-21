@@ -8,7 +8,3 @@ It is a place for things like:
 - [Raising questions/concerns and providing feedback](../../issues)
 - Project planning
 - Storing assets
-
-## Points of Interest
-
-[ℹ️ Learn how to submit your Common Fund project for metric collection](https://nih-cfde.github.io/icc-eval-coordination/).
